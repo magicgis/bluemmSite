@@ -65,7 +65,7 @@
 			<url>http://192.168.11.36:8888/nexus/content/groups/public</url> <url>http://172.16.2.245:8081/nexus/content/groups/public/</url> 
 			</repository> -->
 
-		<!-- <repository>
+		 <repository>
 			<id>nexus</id>
 			<name>nexus</name>
 			<url>http://172.16.2.245:8081/nexus/content/groups/public/</url>
@@ -77,8 +77,8 @@
 				<enabled>true</enabled>
 			</snapshots>
 		</repository> 
--->
-	<!--<repository>
+
+	<repository>
 			<id>spring-milestone</id>
 			<name>Spring Maven MILESTONE Repository</name>
 			<url>http://maven.springframework.org/milestone</url>
