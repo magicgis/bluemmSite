@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.couponmen.dao.MallPromotionActivityCouponMensendDao">
+    
+	<sql id="mallPromotionActivityCouponMensendColumns">
+		a.mensend_id AS "mensendId",
+		a.user_mobile AS "userMobile",
+		a.activity_code AS "activityCode",
+		a.is_send AS "isSend",
+		a.creat_code AS "creatCode",
+		a.creat_by AS "creatBy",
+		a.creat_time AS "creatTime"
+	</sql>
+	
+	<sql id="mallPromotionActivityCouponMensendJoins">
+		
+	</sql>
+    
+	<select id="get" resultType="MallPromotionActivityCouponMensend">
+		SELECT 
+			<include refid="mallPromotionActivityCouponMensendColumns"/>
+		FROM mall_promotion_activity_coupon_mensend a
+		<include refid="mallPromotionActivityCouponMensendJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MallPromotionActivityCouponMensend">
+		select 
+			<include refid="mallPromotionActivityCouponMensendColumns"/>
+			,COUNT(b.detail_id) couponNum,group_concat(b.coupon_s_name SEPARATOR '&lt;BR&gt;') couponStr,c.ACTIVITY_S_NAME activitySName 
+			from 
+				mall_promotion_activity_coupon_mensend a,
+				mall_promotion_activity_coupon_mensend_detail b,
+				mall_promotion_activity_info c
+		<where>
+			a.mensend_id = b.mensend_id and a.ACTIVITY_CODE = c.ACTIVITY_CODE
+			<if test="userMobile != null and userMobile != ''">
+				AND a.user_mobile like concat('%',#{userMobile},'%') 
+			</if>
+			<if test="activityCode != null and activityCode != ''">
+				AND a.activity_code like concat('%',#{activityCode},'%') 
+			</if>
+			<if test="creatCode != null and creatCode != ''">
+				AND a.creat_code like concat('%',#{creatCode},'%') 
+			</if>
+			<if test="startTime != null and startTime != ''">
+				AND a.creat_time > #{startTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				AND a.creat_time &lt; #{endTime}
+			</if>
+			<if test="isSend != null and isSend != ''">
+				AND a.is_send = #{isSend}
+			</if>
+		</where>
+			GROUP BY b.mensend_id
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy},a.creat_time desc
+			</when>
+			<otherwise>
+				ORDER BY a.creat_time desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findExcelList" resultType="MallPromotionActivityCouponMensend">
+		select 
+			<include refid="mallPromotionActivityCouponMensendColumns"/>
+			,COUNT(b.detail_id) couponNum,group_concat(b.coupon_s_name SEPARATOR '；\r\n') couponStr,c.ACTIVITY_S_NAME activitySName 
+			from 
+				mall_promotion_activity_coupon_mensend a,
+				mall_promotion_activity_coupon_mensend_detail b,
+				mall_promotion_activity_info c
+		<where>
+			a.mensend_id = b.mensend_id and a.ACTIVITY_CODE = c.ACTIVITY_CODE
+			<if test="userMobile != null and userMobile != ''">
+				AND a.user_mobile like concat('%',#{userMobile},'%') 
+			</if>
+			<if test="creatBy != null and creatBy != ''">
+				AND a.creat_by like concat('%',#{creatBy},'%') 
+			</if>
+			<if test="startTime != null and startTime != ''">
+				AND a.creat_time > #{startTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				AND a.creat_time &lt; #{endTime}
+			</if>
+			<if test="isSend != null and isSend != ''">
+				AND a.is_send = #{isSend}
+			</if>
+		</where>
+			GROUP BY b.mensend_id
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy},a.creat_time desc
+			</when>
+			<otherwise>
+				ORDER BY a.creat_time desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MallPromotionActivityCouponMensend">
+		SELECT 
+			<include refid="mallPromotionActivityCouponMensendColumns"/>
+		FROM mall_promotion_activity_coupon_mensend a
+		<include refid="mallPromotionActivityCouponMensendJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_promotion_activity_coupon_mensend(
+			mensend_id,
+			user_mobile,
+			activity_code,
+			is_send,
+			creat_code,
+			creat_by,
+			creat_time
+		) VALUES (
+			#{mensendId},
+			#{userMobile},
+			#{activityCode},
+			#{isSend},
+			#{creatCode},
+			#{creatBy},
+			#{creatTime}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_promotion_activity_coupon_mensend SET 	
+			mensend_id = #{mensendId},
+			user_mobile = #{userMobile},
+			activity_code = #{activityCode},
+			is_send = #{isSend},
+			creat_code = #{creatCode},
+			creat_by = #{creatBy},
+			creat_time = #{creatTime}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_promotion_activity_coupon_mensend
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

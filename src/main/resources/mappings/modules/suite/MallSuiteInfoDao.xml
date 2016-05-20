@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.suite.dao.MallSuiteInfoDao">
+	<sql id="selectProductSQl">
+			suite_id AS suiteId,
+			suite_name AS suiteName,
+			suite_sku AS suiteSku,
+			market_price AS marketPrice,
+			pic_url AS picUrl,
+			is_parent AS isParent,
+			status,
+			type,
+			create_by AS createByWho,
+			create_time AS createTime,
+			modify_by AS modifyBy,
+			modify_time AS modifyTime
+	</sql>
+	
+	<select id="getItemSuiteById" parameterType="string" resultType="cn.com.bluemoon.jeesite.modules.item.entity.MallItemSuite">
+		SELECT 
+			<include refid="selectProductSQl"/>
+		FROM mall_item_suite a
+		where 1=1 
+		<if test="suiteId != null and suiteId != ''">
+				AND a.suite_id = #{suiteId}
+		</if>
+	</select>
+	
+	<select id="findList" resultType="cn.com.bluemoon.jeesite.modules.item.entity.MallItemSuite">
+		SELECT
+		<include refid="selectProductSQl"/>
+		FROM
+			mall_item_suite a
+			where a.status = 1
+			<if test="suiteSku != null and suiteSku != ''">
+				AND a.suite_sku LIKE 
+					<if test="dbName == 'oracle'">'%'||#{suiteSku}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{suiteSku}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{suiteSku},'%')</if>
+			</if>
+			<if test="suiteName != null and suiteName != ''">
+				AND a.suite_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{suiteName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{suiteName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{suiteName},'%')</if>
+			</if>
+			order by create_time desc,modify_time desc
+	</select>
+	
+	<select id="suiteProductList" resultType="cn.com.bluemoon.jeesite.modules.suite.entity.MallSuiteDetailGoodVo">
+		SELECT 
+		a.sgood_id as sgoodId,
+		a.sgood_sku as sgoodSku ,
+		a.sgood_type as sgoodType,
+		a.real_price as realPrice,
+		a.market_price as marketPrice,
+		'single' as sgoodType,
+		a.num,
+		b.product_name as itemName
+		from mall_item_suite_detail as a
+		LEFT JOIN mall_product_info as b
+		on a.sgood_id=b.product_id
+		where a.suite_id=#{suiteId}
+	</select>
+	
+	<insert id="insert" >
+		INSERT INTO mall_item_suite(
+			suite_id,suite_name,suite_sku,market_price,pic_url, 
+			is_parent,status,create_by,create_time,modify_by,modify_time,type
+		) VALUES (
+			#{suiteId},#{suiteName},#{suiteSku},#{marketPrice},#{picUrl},
+			#{isParent},#{status},#{createByWho},#{createTime},#{modifyBy},
+			#{modifyTime},#{type}   
+		)
+	</insert>
+	<insert id="saveDetails" >
+		INSERT INTO mall_item_suite_detail(
+			sd_id,suite_id,sgood_id,sgood_sku,sgood_type, 
+			market_price,num,create_by,create_time
+		) VALUES (
+			#{sdId},#{suiteId},#{sgoodId},#{sgoodSku},#{sgoodType},
+			#{marketPrice},#{num},#{createByWho},#{createTime}
+		)
+	</insert>
+	
+	<select id="querySuiteInfoBySuiteId" resultType="cn.com.bluemoon.jeesite.modules.item.entity.MallItemSuite">
+		SELECT
+			suite_id as suiteId,
+			suite_name AS suiteName,
+			suite_sku AS suiteSku,
+			market_price AS marketPrice,
+			pic_url AS picUrl,
+			type
+		FROM
+			mall_item_suite 
+			where 1=1  and suite_id=#{suiteId}
+	</select>
+	
+	
+	<select id="querySuiteDetailBySuiteId" resultType="cn.com.bluemoon.jeesite.modules.item.entity.MallItemDetailVo">
+		SELECT 
+		b.item_sku as goodSku,
+		b.item_name as goodName,
+		a.sgood_type as goodType,
+		a.real_price as realPrice,
+		a.market_price as marketPrice,
+		a.num
+		from mall_item_suite_detail as a
+		LEFT JOIN mall_item_info as b
+		on a.sgood_id=b.item_id
+		where a.suite_id=#{suiteId} AND a.del_flag='0'
+	</select>
+	
+	<select id="findSameSkuList" resultType="cn.com.bluemoon.jeesite.modules.item.entity.MallItemSuite">
+		SELECT
+		<include refid="selectProductSQl"/>
+		FROM
+			mall_item_suite a
+			where 1=1 
+			<if test="suiteSku != null and suiteSku != ''">
+				AND a.suite_sku = #{suiteSku}
+			</if>
+			<if test="suiteId != null and suiteId != ''">
+				AND a.suite_id != #{suiteId}
+			</if>
+	</select>
+	
+	<update id="update">
+		UPDATE mall_item_suite SET 	
+			suite_name = #{suiteName},
+			suite_sku = #{suiteSku},
+			market_price = #{marketPrice},
+			pic_url = #{picUrl}, 
+			is_parent = #{isParent},
+			status = #{status},
+			type = #{type},
+			modify_by = #{modifyBy},
+			modify_time = #{modifyTime}  
+		WHERE suite_id = #{suiteId}
+	</update>
+	
+	<update id="deleteSuiteDetail">
+		UPDATE  mall_item_suite_detail SET
+		del_flag = '1'
+		WHERE suite_id = #{suiteId}
+	</update>
+</mapper>
+

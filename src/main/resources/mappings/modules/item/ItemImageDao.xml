@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.item.dao.ItemImageDao">
+	<!--mybatis ehcache缓存配置 -->
+	<!-- 以下两个<cache>标签二选一,第一个可以输出日志,第二个不输出日志 <cache type="org.mybatis.caches.ehcache.LoggingEhcache" 
+		/> -->
+	<!-- <cache type="org.mybatis.caches.ehcache.EhcacheCache"/> -->
+	<!-- 以下与实体类的中字段一致 -->
+	
+	<!-- 如果是 sqlserver， 可以替换以下的  -->
+		<!-- (select name+',' from mall_admin_role  where mall_admin_role.id in (SELECT roleId FROM mall_admin_user_role WHERE userId=mall_admin_user.id) FOR XML PATH('') ) roleName, -->
+	<insert id="insert">
+		INSERT INTO mall_item_image(
+			id, 
+			item_id, 
+			itme_img_url, 
+			img_type, 
+			position, 
+			status,
+			create_by,
+			create_time,
+			modify_by, 
+			modify_time
+		) VALUES (
+			#{id}, 
+			#{itemId},
+			#{itmeImgUrl},  
+			#{imgType},
+			#{position}, 
+			#{status},   
+			#{createBy.name},  
+			#{createDate},  
+			#{updateBy.name},  
+			#{updateDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_item_image SET 	
+			status = #{status}, 
+			modify_by = #{updateBy.name},  
+			modify_time = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="findByItemId" resultType="cn.com.bluemoon.jeesite.modules.item.entity.MallItemImage">
+		select 
+			id, 
+			item_id, 
+			itme_img_url, 
+			img_type, 
+			position, 
+			status
+		from mall_item_image 
+		where item_id = #{itemId} and status = 1
+	</select>
+	
+	<select id="findByWhere" resultType="cn.com.bluemoon.jeesite.modules.item.entity.MallItemImage">
+		select 
+			id, 
+			item_id, 
+			itme_img_url, 
+			img_type, 
+			position, 
+			status
+		from mall_item_image 
+		where item_id = #{itemId}
+			and img_type = #{imgType}
+		 	and status = 1
+	</select>
+	
+</mapper>

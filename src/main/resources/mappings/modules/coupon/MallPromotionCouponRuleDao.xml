@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.coupon.dao.MallPromotionCouponRuleDao">
+    
+	<sql id="mallPromotionCouponRuleColumns">
+		a.coupon_rule_id AS "couponRuleId",
+		a.coupon_id AS "couponId",
+		a.range_type AS "rangeType",
+		a.condition_type AS "conditionType",
+		a.condition_value AS "conditionValue",
+		a.denomination AS "denomination",
+		a.gift_num AS "giftNum",
+		a.gift_name AS "giftName"
+	</sql>
+	
+	<sql id="mallPromotionCouponRuleJoins">
+	</sql>
+    
+	<select id="get" resultType="MallPromotionCouponRule">
+		SELECT 
+			<include refid="mallPromotionCouponRuleColumns"/>
+		FROM mall_promotion_coupon_rule a
+		<include refid="mallPromotionCouponRuleJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MallPromotionCouponRule">
+		SELECT 
+			<include refid="mallPromotionCouponRuleColumns"/>
+		FROM mall_promotion_coupon_rule a
+		<include refid="mallPromotionCouponRuleJoins"/>
+		<where>
+			<if test="couponId != null and couponId != ''">
+				AND a.coupon_id = #{couponId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MallPromotionCouponRule">
+		SELECT 
+			<include refid="mallPromotionCouponRuleColumns"/>
+		FROM mall_promotion_coupon_rule a
+		<include refid="mallPromotionCouponRuleJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_promotion_coupon_rule(
+			coupon_rule_id,
+			coupon_id,
+			range_type,
+			condition_type,
+			condition_value,
+			denomination,
+			gift_num,
+			gift_name
+		) VALUES (
+			#{couponRuleId},
+			#{couponId},
+			#{rangeType},
+			#{conditionType},
+			#{conditionValue},
+			#{denomination},
+			#{giftNum},
+			#{giftName}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_promotion_coupon_rule SET 	
+			coupon_rule_id = #{couponRuleId},
+			coupon_id = #{couponId},
+			range_type = #{rangeType},
+			condition_type = #{conditionType},
+			condition_value = #{conditionValue},
+			denomination = #{denomination},
+			gift_num = #{giftNum}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_promotion_coupon_rule
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

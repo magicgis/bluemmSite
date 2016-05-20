@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.hb.dao.MallWxRedpacketApplyDao">
+    
+	<sql id="mallWxRedpacketApplyColumns">
+		a.applyid AS "applyid",
+		a.processinstid AS "processinstid",
+		a.merchant_no AS "merchantNo",
+		a.merchant_name AS "merchantName",
+		a.fileid AS "fileid",
+		a.redpacket_total_count AS "redpacketTotalCount",
+		a.redpacket_total_amount AS "redpacketTotalAmount",
+		a.applystatus AS "applystatus",
+		a.applyercode AS "applyercode",
+		a.applyername AS "applyername",
+		a.applydate AS "applydate",
+		a.checkercode AS "checkercode",
+		a.checkername AS "checkername",
+		a.checkdate AS "checkdate",
+		a.back_reason AS "backReason",
+		a.send_status AS "sendStatus",
+		a.isdeleted AS "isdeleted",
+		a.operator AS "operator",
+		a.operatortime AS "operatortime"
+	</sql>
+	
+	<sql id="mallWxRedpacketApplyJoins">
+		 join mall_wx_redpacket_merchant_info b on a.merchant_no = b.merchant_no
+	</sql>
+    
+	<select id="get" resultType="MallWxRedpacketApply">
+		SELECT 
+			<include refid="mallWxRedpacketApplyColumns"/>
+			,b.webchat_public_no AS "webchatPublicNo",b.provider AS "provider"
+		FROM mall_wx_redpacket_apply a
+		<include refid="mallWxRedpacketApplyJoins"/>
+		WHERE a.applyid = #{applyid}
+	</select>
+	
+	<select id="findList" resultType="MallWxRedpacketApply">
+		SELECT 
+			<include refid="mallWxRedpacketApplyColumns"/>
+		FROM mall_wx_redpacket_apply a
+		<include refid="mallWxRedpacketApplyJoins"/>
+		<where>
+			<if test="applyid != null and applyid != ''">
+				AND a.applyid like concat('%',#{applyid},'%') 
+			</if>
+			<if test="applystatus != null and applystatus != ''">
+				<choose>
+					<when test="applystatus == 'send'">
+						AND a.applystatus in (3,5)
+					</when>
+					<otherwise>
+						AND a.applystatus = #{applystatus}
+					</otherwise>
+				</choose>
+			</if>
+			<if test="sendStatus != null and sendStatus != ''">
+				AND a.send_status = #{sendStatus}
+			</if>
+			<if test="startTime != null and startTime != ''">
+				AND a.applydate >= #{startTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				AND a.applydate &lt; #{endTime}
+			</if>
+			<if test="startAduitTime != null and startAduitTime != ''">
+				AND a.checkdate >= #{startAduitTime}
+			</if>
+			<if test="endAduitTime != null and endAduitTime != ''">
+				AND a.checkdate &lt; #{endAduitTime}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.applyid desc,a.applydate desc,a.checkdate desc,a.operatortime desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MallWxRedpacketApply">
+		SELECT 
+			<include refid="mallWxRedpacketApplyColumns"/>
+		FROM mall_wx_redpacket_apply a
+		<include refid="mallWxRedpacketApplyJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_wx_redpacket_apply(
+			applyid,
+			processinstid,
+			merchant_no,
+			merchant_name,
+			fileid,
+			redpacket_total_count,
+			redpacket_total_amount,
+			applystatus,
+			applyercode,
+			applyername,
+			applydate,
+			checkercode,
+			checkername,
+			checkdate,
+			back_reason,
+			send_status,
+			isdeleted,
+			operator,
+			operatortime
+		) VALUES (
+			#{applyid},
+			#{processinstid},
+			#{merchantNo},
+			#{merchantName},
+			#{fileid},
+			#{redpacketTotalCount},
+			#{redpacketTotalAmount},
+			#{applystatus},
+			#{applyercode},
+			#{applyername},
+			#{applydate},
+			#{checkercode},
+			#{checkername},
+			#{checkdate},
+			#{backReason},
+			#{sendStatus},
+			#{isdeleted},
+			#{operator},
+			#{operatortime}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_wx_redpacket_apply SET 	
+			merchant_no = #{merchantNo},
+			merchant_name = #{merchantName},
+			fileid = #{fileid},
+			redpacket_total_count = #{redpacketTotalCount},
+			redpacket_total_amount = #{redpacketTotalAmount},
+			applystatus = #{applystatus},
+			applyercode = #{applyercode},
+			applyername = #{applyername},
+			applydate = #{applydate},
+			checkercode = #{checkercode},
+			checkername = #{checkername},
+			checkdate = #{checkdate},
+			back_reason = #{backReason},
+			send_status = #{sendStatus},
+			isdeleted = #{isdeleted},
+			operator = #{operator},
+			operatortime = #{operatortime}
+		WHERE applyid = #{applyid}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_wx_redpacket_apply
+		WHERE id = #{id}
+	</update>
+	
+	<update id="aduitSave">
+		UPDATE mall_wx_redpacket_apply SET 	
+			applystatus = #{applystatus},
+			checkercode = #{checkercode},
+			checkername = #{checkername},
+			send_status = #{sendStatus},
+			checkdate = #{checkdate},
+			back_reason = #{backReason},
+			operator = #{operator},
+			operatortime = #{operatortime}
+		WHERE applyid = #{applyid}
+	</update>
+</mapper>

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.recommend.dao.MallItemRecommendDao">
+    
+	<sql id="mallItemRecommendColumns">
+		a.id AS "id",
+		a.item_id AS "itemId",
+		a.re_pic_url AS "rePicUrl",
+		a.recommend_type AS "recommendType",
+		a.on_recom_date AS "onRecomDate",
+		a.off_recom_date AS "offRecomDate",
+		a.position AS "position",
+		a.status AS "status"
+	</sql>
+	
+	<sql id="mallItemInfoColumns">
+		b.item_sku AS itemSku,
+		b.item_name AS itemName,
+		b.member_price AS memberPrice,
+		b.market_price AS marketPrice,
+		b.status AS itemStatus
+	</sql>
+	
+	<sql id="mallItemRecommendJoins">
+		left join mall_item_info b on a.item_id = b.item_id 
+	</sql>
+    
+	<select id="get" resultType="MallItemRecommend">
+		SELECT 
+			<include refid="mallItemRecommendColumns"/>,
+			<include refid="mallItemInfoColumns"/>
+		FROM mall_item_recommend a
+		<include refid="mallItemRecommendJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MallItemRecommend">
+		SELECT 
+			<include refid="mallItemRecommendColumns"/>,
+			<include refid="mallItemInfoColumns"/>
+		FROM mall_item_recommend a
+		<include refid="mallItemRecommendJoins"/>
+		<where>
+			
+			<if test="itemId != null and itemId != ''">
+				AND a.item_id LIKE 
+					<if test="dbName == 'oracle'">'%'||#{itemId}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{itemId}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{itemId},'%')</if>
+			</if>
+			<if test="recommendType != null and recommendType != ''">
+				AND a.recommend_type LIKE 
+					<if test="dbName == 'oracle'">'%'||#{recommendType}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{recommendType}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{recommendType},'%')</if>
+			</if>
+			<if test="onRecomDate != null and onRecomDate != ''">
+				and a.on_recom_date between '${onRecomTime} 00:00:00"+' and '${onRecomTime} 23:59:59'
+			</if>
+			<if test="offRecomDate != null and offRecomDate != ''">
+				and a.off_recom_date between '${offRecomTime} 00:00:00' and '${offRecomTime} 23:59:59'
+			</if>
+			<if test="itemStatus != null and itemStatus != ''">
+				AND b.status = #{itemStatus}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="itemSku != null and itemSku != ''">
+				AND b.item_sku LIKE concat('%',#{itemSku},'%')
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.modify_time desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MallItemRecommend">
+		SELECT 
+			<include refid="mallItemRecommendColumns"/>
+		FROM mall_item_recommend a
+		<include refid="mallItemRecommendJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_item_recommend(
+			id,
+			item_id,
+			re_pic_url,
+			recommend_type,
+			on_recom_date,
+			off_recom_date,
+			position,
+			status,
+			create_by,
+			create_time,
+			modify_by,
+			modify_time
+		) VALUES (
+			#{id},
+			#{itemId},
+			#{rePicUrl},
+			#{recommendType},
+			#{onRecomDate},
+			#{offRecomDate},
+			#{position},
+			#{status},
+			#{createBy.name},#{createDate},#{updateBy.name},#{updateDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_item_recommend SET 	
+			item_id = #{itemId},
+			re_pic_url = #{rePicUrl},
+			recommend_type = #{recommendType},
+			on_recom_date = #{onRecomDate},
+			off_recom_date = #{offRecomDate},
+			position = #{position},
+			status = #{status},
+			modify_by = #{updateBy.name},
+			modify_time = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_item_recommend
+		WHERE id = #{id}
+	</update>
+	<select id="findByPosition" resultType="MallItemRecommend">
+		select 
+			<include refid="mallItemRecommendColumns"/>
+		from mall_item_recommend a, mall_item_info b
+		<where>
+			a.item_id = b.item_id
+			AND b.status = 1
+			AND b.online_time &lt; NOW()
+			AND b.offline_time &gt; NOW()
+			AND a.status = 1
+			AND a.on_recom_date &lt; NOW() 
+			AND a.off_recom_date &gt; NOW()
+			<if test="position != null and position != '' and position != 0">
+				and a.position = #{position}
+			</if>
+			<if test="itemId != null and itemId != ''">
+				and a.item_id != #{itemId}
+			</if>
+		</where>
+	</select>
+	<update id="updatePosition">
+		UPDATE 
+			mall_item_info a, mall_item_recommend b
+		SET 
+			b.position = b.position + 1
+		WHERE
+			a.item_id = b.item_id
+		AND a.status = 1
+		AND a.online_time &lt; NOW()
+		AND a.offline_time &gt; NOW()
+		AND b.status = 1
+		AND b.on_recom_date &lt; NOW() 
+		AND b.off_recom_date &gt; NOW()
+		AND b.position >= #{position}
+	</update>
+</mapper>

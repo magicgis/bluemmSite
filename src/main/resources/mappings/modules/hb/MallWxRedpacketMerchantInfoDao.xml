@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.hb.dao.MallWxRedpacketMerchantInfoDao">
+    
+	<sql id="mallWxRedpacketMerchantInfoColumns">
+		a.merchant_no AS "merchantNo",
+		a.merchant_name AS "merchantName",
+		a.webchat_public_no AS "webchatPublicNo",
+		a.provider AS "provider"
+	</sql>
+	
+	<sql id="mallWxRedpacketMerchantInfoJoins">
+	</sql>
+    
+	<select id="get" resultType="MallWxRedpacketMerchantInfo">
+		SELECT 
+			<include refid="mallWxRedpacketMerchantInfoColumns"/>
+		FROM mall_wx_redpacket_merchant_info a
+		<include refid="mallWxRedpacketMerchantInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MallWxRedpacketMerchantInfo">
+		SELECT 
+			<include refid="mallWxRedpacketMerchantInfoColumns"/>
+		FROM mall_wx_redpacket_merchant_info a
+		<include refid="mallWxRedpacketMerchantInfoJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MallWxRedpacketMerchantInfo">
+		SELECT 
+			<include refid="mallWxRedpacketMerchantInfoColumns"/>
+		FROM mall_wx_redpacket_merchant_info a
+		<include refid="mallWxRedpacketMerchantInfoJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_wx_redpacket_merchant_info(
+			merchant_no,
+			merchant_name,
+			webchat_public_no,
+			provider
+		) VALUES (
+			#{merchantNo},
+			#{merchantName},
+			#{webchatPublicNo},
+			#{provider}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_wx_redpacket_merchant_info SET 	
+			merchant_no = #{merchantNo},
+			merchant_name = #{merchantName},
+			webchat_public_no = #{webchatPublicNo},
+			provider = #{provider}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_wx_redpacket_merchant_info
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

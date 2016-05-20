@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.activity.dao.MallPromotionActivityCouponMapDao">
+    
+	<sql id="mallPromotionActivityCouponMapColumns">
+		a.map_id AS "mapId",
+		a.activity_id AS "activityId",
+		a.coupon_id AS "couponId",
+		a.total_limit AS "totalLimit",
+		a.user_limit AS "userLimit",
+		a.user_usable_limit AS "userUsableLimit"
+	</sql>
+	
+	<sql id="otherColumns">
+		b.coupon_code AS "coupon.couponCode",
+		b.coupon_name AS "coupon.couponName",
+		b.coupon_s_name AS "coupon.couponSName",
+	</sql>
+	<sql id="mallPromotionActivityCouponMapJoins">
+		join mall_promotion_coupon_info b on a.coupon_id = b.coupon_id
+	</sql>
+    
+	<select id="get" resultType="MallPromotionActivityCouponMap">
+		SELECT 
+			<include refid="otherColumns"/>
+			<include refid="mallPromotionActivityCouponMapColumns"/>
+		FROM mall_promotion_activity_coupon_map a
+		<include refid="mallPromotionActivityCouponMapJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MallPromotionActivityCouponMap">
+		SELECT 
+			<include refid="otherColumns"/>
+			<include refid="mallPromotionActivityCouponMapColumns"/>
+		FROM mall_promotion_activity_coupon_map a
+		<include refid="mallPromotionActivityCouponMapJoins"/>
+		<where>
+			<if test="activityId != null and activityId != ''">
+				AND a.activity_id = #{activityId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MallPromotionActivityCouponMap">
+		SELECT 
+			<include refid="mallPromotionActivityCouponMapColumns"/>
+		FROM mall_promotion_activity_coupon_map a
+		<include refid="mallPromotionActivityCouponMapJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_promotion_activity_coupon_map(
+			map_id,
+			activity_id,
+			coupon_id,
+			total_limit,
+			user_limit,
+			user_usable_limit
+		) VALUES (
+			#{mapId},
+			#{activityId},
+			#{couponId},
+			#{totalLimit},
+			#{userLimit},
+			#{userUsableLimit}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_promotion_activity_coupon_map SET 	
+			map_id = #{mapId},
+			activity_id = #{activityId},
+			coupon_id = #{couponId},
+			total_limit = #{totalLimit},
+			user_limit = #{userLimit},
+			user_usable_limit = #{userUsableLimit}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_promotion_activity_coupon_map
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.parameter.dao.MallSysParameterDao">
+    
+	<sql id="mallSysParameterColumns">
+		a.para_id AS "paraId",
+		a.para_type AS "paraType",
+		a.para_code AS "paraCode",
+		a.para_desc AS "paraDesc",
+		a.para_value AS "paraValue",
+		a.oper_user AS "operUser",
+		a.oper_date AS "operDate"
+	</sql>
+	
+	<sql id="mallSysParameterJoins">
+	</sql>
+    
+	<select id="get" resultType="MallSysParameter">
+		SELECT 
+			<include refid="mallSysParameterColumns"/>
+		FROM mall_sys_parameter a
+		<include refid="mallSysParameterJoins"/>
+		WHERE a.para_id = #{id}
+	</select>
+	
+	<select id="getSysParameterByCode" resultType="MallSysParameter">
+		SELECT 
+			<include refid="mallSysParameterColumns"/>
+		FROM mall_sys_parameter a
+		<include refid="mallSysParameterJoins"/>
+		WHERE a.para_type = #{paraType} and a.para_code = #{paraCode}
+	</select>
+	
+	<select id="findList" resultType="MallSysParameter">
+		SELECT 
+			<include refid="mallSysParameterColumns"/>
+		FROM mall_sys_parameter a
+		<where>
+			<if test="paraType != null and paraType != ''">
+				AND a.para_type like 
+					<if test="dbName == 'oracle'">'%'||#{paraType}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{paraType}+'%'</if>
+					<if test="dbName == 'mysql'">CONCAT('%', #{paraType}, '%')</if>
+			</if>
+			<if test="paraCode != null and paraCode != ''">
+				AND a.para_code like 
+					<if test="dbName == 'oracle'">'%'||#{paraCode}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{paraCode}+'%'</if>
+					<if test="dbName == 'mysql'">CONCAT('%', #{paraCode}, '%')</if>
+			</if>
+			<if test="paraValue != null and paraValue != ''">
+				AND a.para_value like 
+					<if test="dbName == 'oracle'">'%'||#{paraValue}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{paraValue}+'%'</if>
+					<if test="dbName == 'mysql'">CONCAT('%', #{paraValue}, '%')</if>
+			</if>
+		</where>
+		ORDER BY operDate DESC
+	</select>
+	
+	<select id="findAllList" resultType="MallSysParameter">
+		SELECT 
+			<include refid="mallSysParameterColumns"/>
+		FROM mall_sys_parameter a
+		<include refid="mallSysParameterJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_sys_parameter(
+			para_id,
+			para_type,
+			para_code,
+			para_desc,
+			para_value,
+			oper_user,
+			oper_date
+		) VALUES (
+			#{paraId},
+			#{paraType},
+			#{paraCode},
+			#{paraDesc},
+			#{paraValue},
+			#{operUser},
+			#{operDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_sys_parameter SET 	
+			para_id = #{paraId},
+			para_type = #{paraType},
+			para_code = #{paraCode},
+			para_desc = #{paraDesc},
+			para_value = #{paraValue},
+			oper_user = #{operUser},
+			oper_date = #{operDate}
+		WHERE para_id = #{paraId}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_sys_parameter
+		WHERE para_id = #{paraId}
+	</update>
+	
+</mapper>

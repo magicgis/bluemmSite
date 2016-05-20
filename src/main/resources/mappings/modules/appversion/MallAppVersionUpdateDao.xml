@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.appversion.dao.MallAppVersionUpdateDao">
+    
+	<sql id="mallAppVersionUpdateColumns">
+		a.id AS "id",
+		a.build_version AS "buildVersion",
+		a.must_update AS "mustUpdate",
+		a.version AS "version",
+		a.download AS "download",
+		a.platform AS "platform",
+		a.description AS "description",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.last_update_by AS "lastUpdateBy",
+		a.last_update_date AS "lastUpdateDate",
+		a.app_type AS "appType",
+		a.status AS "status"
+	</sql>
+	
+	<sql id="mallAppVersionUpdateJoins">
+	</sql>
+    
+	<select id="get" resultType="MallAppVersionUpdate">
+		SELECT 
+			<include refid="mallAppVersionUpdateColumns"/>
+		FROM mall_app_version_update a
+		<include refid="mallAppVersionUpdateJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MallAppVersionUpdate">
+		SELECT 
+			<include refid="mallAppVersionUpdateColumns"/>
+		FROM mall_app_version_update a
+		<include refid="mallAppVersionUpdateJoins"/>
+		<where>
+			
+			<if test="mustUpdate != null and mustUpdate != ''">
+				AND a.must_update = #{mustUpdate}
+			</if>
+			<if test="version != null and version != ''">
+				AND a.version LIKE 
+					<if test="dbName == 'oracle'">'%'||#{version}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{version}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{version},'%')</if>
+			</if>
+			<if test="platform != null and platform != ''">
+				AND a.platform = #{platform}
+			</if>
+			<if test="appType != null and appType != ''">
+				AND a.app_type LIKE 
+					<if test="dbName == 'oracle'">'%'||#{appType}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{appType}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{appType},'%')</if>
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.last_update_date desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MallAppVersionUpdate">
+		SELECT 
+			<include refid="mallAppVersionUpdateColumns"/>
+		FROM mall_app_version_update a
+		<include refid="mallAppVersionUpdateJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_app_version_update(
+			id,
+			build_version,
+			must_update,
+			version,
+			download,
+			platform,
+			description,
+			app_type,
+			status,
+			create_by,create_date,last_update_by,last_update_date
+		) VALUES (
+			#{id},
+			#{buildVersion},
+			#{mustUpdate},
+			#{version},
+			#{download},
+			#{platform},
+			#{description},
+			#{appType},
+			#{status},
+			#{createBy.name},#{createDate},#{updateBy.name},#{updateDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_app_version_update SET 	
+			build_version = #{buildVersion},
+			must_update = #{mustUpdate},
+			version = #{version},
+			download = #{download},
+			platform = #{platform},
+			description = #{description},
+			app_type = #{appType},
+			status = #{status},
+			last_update_by = #{updateBy.name},
+			last_update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_app_version_update
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

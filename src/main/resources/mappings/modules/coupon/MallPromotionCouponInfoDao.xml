@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.coupon.dao.MallPromotionCouponInfoDao">
+    
+	<sql id="mallPromotionCouponInfoColumns">
+		a.coupon_id AS "couponId",
+		a.coupon_code AS "couponCode",
+		a.op_code AS "opCode",
+		a.op AS "op",
+		a.op_time AS "opTime",
+		CONCAT(a.coupon_type,'_',a.gift_type) AS "couponType",
+		a.gift_type AS "giftType",
+		a.coupon_s_name AS "couponSName",
+		a.coupon_name AS "couponName",
+		a.time_type AS "timeType",
+		a.start_time AS "startTime",
+		a.end_time AS "endTime",
+		a.direction AS "direction",
+		a.status AS "status",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.valid_days as "validDays"
+	</sql>
+	
+	<sql id="mallPromotionCouponInfoJoins">
+	</sql>
+    
+	<select id="get" resultType="MallPromotionCouponInfo">
+		SELECT 
+			<include refid="mallPromotionCouponInfoColumns"/>
+		FROM mall_promotion_coupon_info a
+		<include refid="mallPromotionCouponInfoJoins"/>
+		WHERE a.coupon_id = #{couponId}
+	</select>
+	
+	<select id="getCouponByCouponCode" resultType="MallPromotionCouponInfo">
+		SELECT 
+			<include refid="mallPromotionCouponInfoColumns"/>
+		FROM mall_promotion_coupon_info a
+		<include refid="mallPromotionCouponInfoJoins"/>
+		WHERE a.coupon_code = #{couponCode} and a.status = 1 and (a.END_TIME is null OR a.END_TIME > NOW())
+	</select>
+	
+	<select id="findList" resultType="MallPromotionCouponInfo">
+		SELECT 
+			<include refid="mallPromotionCouponInfoColumns"/>
+			,case  when a.valid_days=0 then ''
+ 		else  a.valid_days end as 'validDaysStr'	
+		FROM mall_promotion_coupon_info a
+		<include refid="mallPromotionCouponInfoJoins"/>
+		<where>
+			a.del_flag = 0
+			<if test="couponId != null and couponId != ''">
+				AND a.coupon_id = #{couponId}
+			</if>
+			<if test="couponCode != null and couponCode != ''">
+				AND a.coupon_code like concat('%',#{couponCode},'%') 
+			</if>
+			<if test="opCode != null and opCode != ''">
+				AND a.op_code = #{opCode}
+			</if>
+			<if test="op != null and op != ''">
+				AND a.op = #{op}
+			</if>
+			<if test="opTime != null and opTime != ''">
+				AND a.op_time = #{opTime}
+			</if>
+			<if test="couponType != null and couponType != ''">
+				AND a.coupon_type = #{couponType}
+			</if>
+			<if test="giftType != null and giftType != ''">
+				AND a.gift_type = #{giftType}
+			</if>
+			<if test="couponSName != null and couponSName != ''">
+				AND a.coupon_s_name like concat('%',#{couponSName},'%')  
+			</if>
+			<if test="couponName != null and couponName != ''">
+				AND a.coupon_name = like concat('%',#{couponName},'%')
+			</if>
+			<if test="timeType != null and timeType != ''">
+				AND a.time_type = #{timeType}
+			</if>
+			<if test="startTime != null and startTime != ''">
+				AND a.end_time > #{startTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				AND a.start_time &lt; #{endTime}
+			</if>
+			<if test="status != null and status != ''">
+				<if test="status == 3">
+					AND a.status = 0 
+				</if>
+				<if test="status == 1">
+					AND a.status = 1 and (a.time_type != 'fixedTime' || a.end_time > NOW())
+				</if>
+				<if test="status == 2">
+					AND a.status = 1 and a.end_time &lt; NOW()
+				</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.status desc,a.op_time DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MallPromotionCouponInfo">
+		SELECT 
+			<include refid="mallPromotionCouponInfoColumns"/>
+		FROM mall_promotion_coupon_info a
+		<include refid="mallPromotionCouponInfoJoins"/>
+		<where>
+			a.del_flag = 0
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.op_time DESC 
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_promotion_coupon_info(
+			coupon_id,
+			coupon_code,
+			op_code,
+			op,
+			op_time,
+			coupon_type,
+			gift_type,
+			coupon_s_name,
+			coupon_name,
+			time_type,
+			start_time,
+			end_time,
+			direction,
+			status,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			valid_days
+		) VALUES (
+			#{couponId},
+			#{couponCode},
+			#{opCode},
+			#{op},
+			#{opTime},
+			#{couponType},
+			#{giftType},
+			#{couponSName},
+			#{couponName},
+			#{timeType},
+			#{startTime},
+			#{endTime},
+			#{direction},
+			#{status},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{validDays}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_promotion_coupon_info SET 	
+			coupon_id = #{couponId},
+			coupon_code = #{couponCode},
+			op_code = #{opCode},
+			op = #{op},
+			op_time = #{opTime},
+			coupon_type = #{couponType},
+			gift_type = #{giftType},
+			coupon_s_name = #{couponSName},
+			coupon_name = #{couponName},
+			time_type = #{timeType},
+			start_time = #{startTime},
+			end_time = #{endTime},
+			direction = #{direction},
+			status = #{status},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE a.coupon_id = #{couponId}
+	</update>
+	
+	<update id="delete">
+		UPDATE mall_promotion_coupon_info SET 
+			status = 0,op_time = NOW()
+		WHERE coupon_id = #{couponId}
+	</update>
+	
+	<update id="cancelCoupon">
+		UPDATE mall_promotion_coupon_info SET 
+			status = 0,op_time = NOW(),op_code = #{updateName}
+		WHERE coupon_id = #{couponId}
+	</update>
+	
+	
+	<select id="getActivityByCouponId" resultType="cn.com.bluemoon.jeesite.modules.activity.entity.MallPromotionActivityInfo">
+		select 
+			a.activity_id AS "activityId",
+			a.activity_code AS "activityCode",
+			a.activity_theme AS "activityTheme",
+			a.activity_type AS "activityType",
+			a.activity_name AS "activityName",
+			a.activity_s_name AS "activitySName",
+			a.start_time AS "startTime",
+			a.end_time AS "endTime",
+			a.activity_desc AS "activityDesc",
+			a.range_type AS "rangeType",
+			a.status AS "status",
+			a.create_by AS "createName",
+			a.create_code AS "createCode",
+			a.create_date AS "createDate",
+			a.update_by AS "updateBy.id",
+			a.update_date AS "updateDate",
+			a.remarks AS "remarks",
+			a.del_flag AS "delFlag"
+		from mall_promotion_activity_info a,
+		mall_promotion_activity_coupon_map b
+		where b.COUPON_ID = ${couponId}
+		and a.ACTIVITY_ID = b.ACTIVITY_ID
+		and a.status = 1
+		and a.END_TIME > NOW()
+	</select>
+	
+</mapper>

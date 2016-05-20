@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.activity.dao.MallPromotionActivityMjsLevelDao">
+    
+	<sql id="mallPromotionActivityMjsLevelColumns">
+		a.mjs_level_id AS "mjsLevelId",
+		a.activity_id AS "activityId",
+		a.level AS "level",
+		a.condition_value AS "conditionValue",
+		a.preferential_type AS "preferentialType",
+		a.preferential_value AS "preferentialValue",
+		a.gift_type AS "giftType",
+		a.gift_sku AS "giftSku",
+		a.gift_name AS "giftName",
+		a.gift_num AS "giftNum"
+	</sql>
+	
+	<sql id="mallPromotionActivityMjsLevelJoins">
+	</sql>
+    
+	<select id="get" resultType="MallPromotionActivityMjsLevel">
+		SELECT 
+			<include refid="mallPromotionActivityMjsLevelColumns"/>
+		FROM mall_promotion_activity_mjs_level a
+		<include refid="mallPromotionActivityMjsLevelJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MallPromotionActivityMjsLevel">
+		SELECT 
+			<include refid="mallPromotionActivityMjsLevelColumns"/>
+		FROM mall_promotion_activity_mjs_level a
+		<include refid="mallPromotionActivityMjsLevelJoins"/>
+		<where>
+			<if test="activityId != null and activityId != ''">
+				a.activity_id = #{activityId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MallPromotionActivityMjsLevel">
+		SELECT 
+			<include refid="mallPromotionActivityMjsLevelColumns"/>
+		FROM mall_promotion_activity_mjs_level a
+		<include refid="mallPromotionActivityMjsLevelJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_promotion_activity_mjs_level(
+			mjs_level_id,
+			activity_id,
+			level,
+			condition_value,
+			preferential_type,
+			preferential_value,
+			gift_type,
+			gift_sku,
+			gift_name,
+			gift_num,
+			gift_price,
+			gift_picture
+		) VALUES (
+			#{mjsLevelId},
+			#{activityId},
+			#{level},
+			#{conditionValue},
+			#{preferentialType},
+			#{preferentialValue},
+			#{giftType},
+			#{giftSku},
+			#{giftName},
+			#{giftNum},
+			#{giftPrice},
+			#{giftPicture}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_promotion_activity_mjs_level SET 	
+			mjs_level_id = #{mjsLevelId},
+			activity_id = #{activityId},
+			level = #{level},
+			condition_value = #{conditionValue},
+			preferential_type = #{preferentialType},
+			preferential_value = #{preferentialValue},
+			gift_type = #{giftType},
+			gift_sku = #{giftSku},
+			gift_name = #{giftName},
+			gift_num = #{giftNum}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_promotion_activity_mjs_level
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

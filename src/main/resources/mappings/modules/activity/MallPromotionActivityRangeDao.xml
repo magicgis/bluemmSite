@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.activity.dao.MallPromotionActivityRangeDao">
+    
+	<sql id="mallPromotionActivityRangeColumns">
+		a.activity_range_id AS "activityRangeId",
+		a.activity_id AS "activityId",
+		a.item_sku AS "itemSku",
+		a.item_name AS "itemName"
+	</sql>
+	
+	<sql id="mallPromotionActivityRangeJoins">
+	</sql>
+    
+	<select id="get" resultType="MallPromotionActivityRange">
+		SELECT 
+			<include refid="mallPromotionActivityRangeColumns"/>
+		FROM mall_promotion_activity_range a
+		<include refid="mallPromotionActivityRangeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MallPromotionActivityRange">
+		SELECT 
+			<include refid="mallPromotionActivityRangeColumns"/>
+		FROM mall_promotion_activity_range a
+		<include refid="mallPromotionActivityRangeJoins"/>
+		<where>
+			<if test="activityId != null and activityId != ''">
+				a.activity_id = #{activityId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MallPromotionActivityRange">
+		SELECT 
+			<include refid="mallPromotionActivityRangeColumns"/>
+		FROM mall_promotion_activity_range a
+		<include refid="mallPromotionActivityRangeJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_promotion_activity_range(
+			activity_range_id,
+			activity_id,
+			item_sku,
+			item_name
+		) VALUES (
+			#{activityRangeId},
+			#{activityId},
+			#{itemSku},
+			#{itemName}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_promotion_activity_range SET 	
+			activity_range_id = #{activityRangeId},
+			activity_id = #{activityId},
+			item_sku = #{itemSku},
+			item_name = #{itemName}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_promotion_activity_range
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

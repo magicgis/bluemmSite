@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.activityauth.dao.MallPromotionActivityAuthAngelDao">
+    
+	<sql id="mallPromotionActivityAuthAngelColumns">
+		a.map_id AS "mapId",
+		a.auth_id AS "authId",
+		a.angel_id AS "angelId",
+		a.angel_name AS "angelName",
+		a.angel_mobile AS "angelMobile",
+		a.status AS "status",
+		a.op_code AS "opCode",
+		a.op_time AS "opTime"
+	</sql>
+	
+	<sql id="mallPromotionActivityAuthAngelJoins">
+	</sql>
+    
+	<select id="get" resultType="MallPromotionActivityAuthAngel">
+		SELECT 
+			<include refid="mallPromotionActivityAuthAngelColumns"/>
+		FROM mall_promotion_activity_auth_angel a
+		<include refid="mallPromotionActivityAuthAngelJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MallPromotionActivityAuthAngel">
+		SELECT 
+			<include refid="mallPromotionActivityAuthAngelColumns"/>
+		FROM mall_promotion_activity_auth_angel a
+		<include refid="mallPromotionActivityAuthAngelJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="getAngelByAuthIdAndAngelId"  resultType="MallPromotionActivityAuthAngel">
+		SELECT 
+			<include refid="mallPromotionActivityAuthAngelColumns"/>
+		FROM mall_promotion_activity_auth_angel a
+		<include refid="mallPromotionActivityAuthAngelJoins"/>
+		<where>
+			a.auth_id = ${authId} AND a.status = 1 and a.angel_id = ${angelId}
+		</where>
+		limit 1;
+	</select>
+	
+	<select id="findListByAuthId" resultType="MallPromotionActivityAuthAngel">
+		SELECT 
+			<include refid="mallPromotionActivityAuthAngelColumns"/>
+		FROM mall_promotion_activity_auth_angel a
+		<include refid="mallPromotionActivityAuthAngelJoins"/>
+		<where>
+			a.auth_id = ${authId} AND a.status = 1
+		</where>
+		ORDER BY a.op_time desc
+		<choose>
+			<when test="pageNo != null">
+			limit ${pageNo},20
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+		
+	</select>
+	
+	<select id="findAllList" resultType="MallPromotionActivityAuthAngel">
+		SELECT 
+			<include refid="mallPromotionActivityAuthAngelColumns"/>
+		FROM mall_promotion_activity_auth_angel a
+		<include refid="mallPromotionActivityAuthAngelJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_promotion_activity_auth_angel(
+			map_id,
+			auth_id,
+			angel_id,
+			angel_name,
+			angel_mobile,
+			status,
+			op_code,
+			op_time
+		) VALUES (
+			#{mapId},
+			#{authId},
+			#{angelId},
+			#{angelName},
+			#{angelMobile},
+			#{status},
+			#{opCode},
+			#{opTime}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_promotion_activity_auth_angel SET 	
+			map_id = #{mapId},
+			auth_id = #{authId},
+			angel_id = #{angelId},
+			angel_name = #{angelName},
+			angel_mobile = #{angelMobile},
+			status = #{status},
+			op_code = #{opCode},
+			op_time = #{opTime}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateAngelStatus">
+		UPDATE mall_promotion_activity_auth_angel SET 	
+			status = 2,
+			op_code = #{opCode},
+			op_time = #{opTime}
+		WHERE auth_id = #{authId} and angel_id = #{angelId}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_promotion_activity_auth_angel
+		WHERE id = #{id}
+	</update>
+	
+	<update id="cancel">
+		UPDATE mall_promotion_activity_auth_angel SET 
+		status = 2,
+		op_code = #{opCode},
+		op_time = now()
+		where auth_id = ${authId} AND angel_id = ${angelId}
+	</update>
+	
+</mapper>

@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.recommendinfo.dao.MallRecommendInfoDao">
+    
+	<sql id="mallRecommendInfoColumns">
+		a.id AS "id",
+		a.order_code AS "orderCode",
+		a.order_pay_time AS "orderPayTime",
+		a.order_money AS "orderMoney",
+		a.registrant AS "registrant",
+		a.registrant_mobile AS "registrantMobile"
+	</sql>
+	<sql id="recommendAndOper">
+		a.id AS "id",
+		a.order_code AS "orderCode",
+		a.order_pay_time AS "orderPayTime",
+		a.order_money AS "orderMoney",
+		a.registrant AS "registrant",
+		a.registrant_mobile AS "registrantMobile",
+		b.UPDATE_BY AS "updatBy",
+		b.UPDATE_TIME AS "updateTime",
+		b.OLD_RECOMMEND AS "oldRecommend",
+		b.NEW_RECOMMEND AS "newRecommend",
+		b.PICTURE_FIRST AS "pictureFirst",
+		b.PICTURE_SECOND AS "pictureSecond",
+		b.ADUIT_STATUS AS "aduitStatus",
+		b.ADUIT_REASON AS "aduitReason",
+		b.ADUIT_BY AS "aduitBy",
+		b.ADUIT_TIME AS "aduitTime"
+	</sql>
+	<sql id="mallRecommendOperInfoColumns">
+		b.UPDATE_BY AS "updatBy",
+		b.UPDATE_TIME AS "updateTime",
+		b.OLD_RECOMMEND AS "oldRecommend",
+		b.NEW_RECOMMEND AS "newRecommend",
+		b.PICTURE_FIRST AS "pictureFirst",
+		b.PICTURE_SECOND AS "pictureSecond",
+		b.ADUIT_STATUS AS "aduitStatus",
+		b.ADUIT_REASON AS "aduitReason",
+		b.ADUIT_BY AS "aduitBy",
+		b.ADUIT_TIME AS "aduitTime"
+	</sql>
+	<sql id="mallOrderInfoColumns">
+		a.order_id AS "orderId",
+		a.outer_code AS "outerCode",
+		a.state AS "state",
+		a.pay_time AS "payTime",
+		a.recommend_code AS "recommendCode",
+		a.parent_code AS "parentCode",
+		a.pay_total AS "payTotal",
+		b.mobile AS "userMobile",
+		c.nick_name AS "nickName"
+	</sql>
+	<select id="getOperInfoById" resultType="MallRecommendOperInfo">
+		SELECT
+		<include refid="mallRecommendOperInfoColumns"/>
+		FROM mall_recommend_oper_info b
+		where b.recommend_info_id = #{id}
+		AND b.aduit_status != '0'
+		order by id desc
+	</select>
+	
+	<select id="getRecommendByOrderCode" resultType="MallRecommendInfo">
+		SELECT
+		<include refid="mallRecommendInfoColumns"/>
+		FROM mall_recommends_info a
+		WHERE a.order_code = #{orderCode} or a.order_code like concat('%',#{orderCode},'%')
+		LIMIT 1
+	</select>
+	
+	<select id="getOperInfoByReId" resultType="MallRecommendOperInfo">
+		SELECT 
+		<include refid="mallRecommendOperInfoColumns"/>
+		FROM mall_recommend_oper_info b,(select id from mall_recommend_oper_info where recommend_info_id = #{recommendInfoId} ORDER BY id desc LIMIT 1) c
+		<where>
+		 b.recommend_info_id = #{recommendInfoId}
+		<if test="oldRecommend != null and oldRecommend != ''">
+				AND b.OLD_RECOMMEND like concat('%',#{oldRecommend},'%')
+		</if>
+		<if test="aduitStatus != null and aduitStatus != ''">
+				AND b.aduit_status = #{aduitStatus}
+		</if>
+		AND c.id = b.id
+		</where>
+		<choose>
+			<when test="haveRecommend != null and haveRecommend != '' and haveRecommend == 0">
+				AND b.OLD_RECOMMEND =''
+			</when>
+			<when test="haveRecommend != null and haveRecommend != '' and haveRecommend == 1">
+			    AND b.OLD_RECOMMEND !=''
+			</when>
+			</choose>
+		order by b.id desc limit 1
+	</select>
+	
+	<sql id="mallRecommendInfoJoins">
+	</sql>
+    
+    <select id="getOrderByOrderCode" resultType="MallOrderInfo">
+    	SELECT 
+			<include refid="mallOrderInfoColumns"/>
+		FROM mall_order_info a,mall_user_base b, mall_user_info c
+		where a.outer_code = #{orderCode} and a.pay_time is not null and a.user_id = b.user_id and a.user_id = c.user_id
+    </select>
+    
+	<select id="get" resultType="MallRecommendInfo">
+		SELECT 
+			<include refid="mallRecommendInfoColumns"/>
+		FROM mall_recommends_info a
+		<include refid="mallRecommendInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MallRecommendInfo">
+		SELECT 
+			<include refid="recommendAndOper"/>
+		FROM mall_recommends_info a 
+		LEFT JOIN 
+		mall_recommend_oper_info b on a.ID=b.RECOMMEND_INFO_ID
+		<include refid="mallRecommendInfoJoins"/>
+		<where>
+			EXISTS (
+				 select a.id from (
+				  SELECT max(tt.id) as id FROM mall_recommend_oper_info tt group by 
+				tt.RECOMMEND_INFO_ID ) temp_count 
+				 where temp_count.id=b.id
+				)
+			<if test="orderCode != null and orderCode != ''">
+				AND a.order_code like concat('%',#{orderCode},'%')
+			</if>
+			<if test="registrantMobile != null and registrantMobile != ''">
+				AND a.registrant_mobile like concat('%',#{registrantMobile},'%')
+			</if>
+			<if test="startTime != null and startTime != ''">
+				AND a.order_pay_time > #{startTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				AND a.order_pay_time &lt; #{endTime}
+			</if>
+			<if test="oldRecommend != null and oldRecommend != ''">
+				AND b.OLD_RECOMMEND like concat('%',#{oldRecommend},'%')
+		</if>
+		<if test="aduitStatus != null and aduitStatus != ''">
+				AND b.aduit_status = #{aduitStatus}
+		</if>
+		</where>
+		<choose>
+		<when test="haveRecommend != null and haveRecommend != '' and haveRecommend == 0">
+				AND b.OLD_RECOMMEND =''
+			</when>
+			<when test="haveRecommend != null and haveRecommend != '' and haveRecommend == 1">
+			    AND b.OLD_RECOMMEND !=''
+			</when>
+		</choose>
+		order by b.update_time desc
+	</select>
+	
+	<select id="findAllList" resultType="MallRecommendInfo">
+		SELECT 
+			<include refid="mallRecommendInfoColumns"/>
+		FROM mall_recommends_info a
+		<include refid="mallRecommendInfoJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_recommends_info(
+			id,
+			order_code,
+			order_pay_time,
+			order_money,
+			registrant,
+			registrant_mobile
+		) VALUES (
+			#{id},
+			#{orderCode},
+			#{orderPayTime},
+			#{orderMoney},
+			#{registrant},
+			#{registrantMobile}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_recommends_info SET 	
+			order_code = #{orderCode},
+			order_pay_time = #{orderPayTime},
+			order_money = #{orderMoney},
+			registrant = #{registrant},
+			registrant_mobile = #{registrantMobile}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateOrderRecomment">
+		UPDATE mall_order_info SET
+			recommend_code = #{recommendCode}
+		WHERE outer_code = #{orderCode}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_recommends_info
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

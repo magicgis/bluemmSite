@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.recommendinfo.dao.MallRecommendOperInfoDao">
+    
+	<sql id="mallRecommendOperInfoColumns">
+		a.id AS "id",
+		a.recommend_info_id AS "recommendInfoId",
+		a.update_by AS "updatBy",
+		a.update_time AS "updateTime",
+		a.old_recommend AS "oldRecommend",
+		a.new_recommend AS "newRecommend",
+		a.picture_first AS "pictureFirst",
+		a.picture_second AS "pictureSecond",
+		a.aduit_status AS "aduitStatus",
+		a.aduit_reason AS "aduitReason",
+		a.aduit_by AS "aduitBy",
+		a.aduit_time AS "aduitTime"
+	</sql>
+	
+	<sql id="mallRecommendOperInfoJoins">
+	</sql>
+    
+	<select id="get" resultType="MallRecommendOperInfo">
+		SELECT 
+			<include refid="mallRecommendOperInfoColumns"/>
+		FROM mall_recommend_oper_info a
+		<include refid="mallRecommendOperInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MallRecommendOperInfo">
+		SELECT 
+			<include refid="mallRecommendOperInfoColumns"/>
+		FROM mall_recommend_oper_info a
+		<include refid="mallRecommendOperInfoJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MallRecommendOperInfo">
+		SELECT 
+			<include refid="mallRecommendOperInfoColumns"/>
+		FROM mall_recommend_oper_info a
+		<include refid="mallRecommendOperInfoJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_recommend_oper_info(
+			id,
+			recommend_info_id,
+			update_by,
+			update_time,
+			old_recommend,
+			new_recommend,
+			picture_first,
+			picture_second,
+			aduit_status,
+			aduit_reason,
+			aduit_by,
+			aduit_time
+		) VALUES (
+			#{id},
+			#{recommendInfoId},
+			#{updatBy},
+			#{updateTime},
+			#{oldRecommend},
+			#{newRecommend},
+			#{pictureFirst},
+			#{pictureSecond},
+			#{aduitStatus},
+			#{aduitReason},
+			#{aduitBy},
+			#{aduitTime}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_recommend_oper_info SET 	
+			recommend_info_id = #{recommendInfoId},
+			update_by = #{updateBy.id},
+			update_time = #{updateTime},
+			old_recommend = #{oldRecommend},
+			new_recommend = #{newRecommend},
+			picture_first = #{pictureFirst},
+			picture_second = #{pictureSecond},
+			aduit_status = #{aduitStatus},
+			aduit_reason = #{aduitReason},
+			aduit_by = #{aduitBy},
+			aduit_time = #{aduitTime}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_recommend_oper_info
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

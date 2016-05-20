@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.activityauth.dao.MallPromotionActivityAuthDao">
+    
+	<sql id="mallPromotionActivityAuthColumns">
+		a.auth_id AS "authId",
+		a.activity_id AS "activityId",
+		a.status AS "status",
+		a.creat_code AS "creatCode",
+		a.creat_by AS "creatBy",
+		a.creat_time AS "creatTime",
+		a.update_code AS "updateCode",
+		a.update_by AS "updatBy",
+		a.update_time AS "updateTime",
+		a.activity_code AS "activityCode"
+		
+	</sql>
+	
+	<sql id="mallPromotionActivityAuthJoins">
+	</sql>
+    
+	<select id="get" resultType="MallPromotionActivityAuth">
+		SELECT 
+			<include refid="mallPromotionActivityAuthColumns"/>
+		,b.ACTIVITY_S_NAME as "activitySName",
+		b.ACTIVITY_NAME as "activityName",
+		b.start_time as "startTime",
+		b.end_time as "endTime"	
+		FROM mall_promotion_activity_auth a, mall_promotion_activity_info b
+		<include refid="mallPromotionActivityAuthJoins"/>
+		WHERE a.auth_id = #{authId} AND a.activity_id = b.activity_id
+	</select>
+	
+	<select id="findList" resultType="MallPromotionActivityAuth">
+		SELECT 
+			<include refid="mallPromotionActivityAuthColumns"/>
+		,b.ACTIVITY_S_NAME as "activitySName",
+		b.start_time as "startTime",
+		b.end_time as "endTime"
+		FROM mall_promotion_activity_auth a, mall_promotion_activity_info b
+		
+		<include refid="mallPromotionActivityAuthJoins"/>
+		<where>
+			a.activity_id = b.activity_id
+			<if test="activityCode != null and activityCode != ''">
+				AND a.ACTIVITY_CODE like concat('%',#{activityCode},'%')
+			</if>
+			<if test="activitySName != null and activitySName != ''">
+				AND b.activity_s_name like concat('%',#{activitySName},'%') 
+			</if>
+			<if test="startTime != null and startTime != ''">
+				AND b.end_time > #{startTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				AND b.start_time &lt; #{endTime}
+			</if>
+			<if test="status != null and status !='' or status==0" >	
+				<choose>
+					<when test="status == 1">
+						AND a.status = 1 and b.end_time &gt; NOW()
+					</when>
+					<when test="status == 2">
+						AND a.status = #{status}
+					</when>
+				</choose>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				order by a.update_time desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MallPromotionActivityAuth">
+		SELECT 
+			<include refid="mallPromotionActivityAuthColumns"/>
+		FROM mall_promotion_activity_auth a
+		<include refid="mallPromotionActivityAuthJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_promotion_activity_auth(
+			auth_id,
+			activity_id,
+			status,
+			creat_code,
+			creat_by,
+			creat_time,
+			update_code,
+			update_by,
+			update_time,
+			activity_code
+		) VALUES (
+			#{authId},
+			#{activityId},
+			#{status},
+			#{creatCode},
+			#{creatBy},
+			#{creatTime},
+			#{updateCode},
+			#{updatBy},
+			#{updateTime},
+			#{activityCode}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_promotion_activity_auth SET 	
+			auth_id = #{authId},
+			activity_id = #{activityId},
+			status = #{status},
+			creat_code = #{creatCode},
+			creat_by = #{creatBy},
+			creat_time = #{creatTime},
+			update_code = #{updateCode},
+			update_by = #{updateBy.id},
+			update_time = #{updateTime}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_promotion_activity_auth
+		WHERE id = #{id}
+	</update>
+	
+	<update id="cancel">
+		UPDATE mall_promotion_activity_auth SET 
+		update_code = #{updateCode},
+		update_by = #{updatBy},
+		update_time = #{updateTime},
+		status = #{status}
+		WHERE auth_id = #{authId}
+	</update>
+	
+	<update id="updateUser">
+		UPDATE mall_promotion_activity_auth SET 
+		update_code = #{updateCode},
+		update_by = #{updatBy},
+		update_time = #{updateTime}
+		WHERE auth_id = #{authId}
+	</update>
+	
+</mapper>

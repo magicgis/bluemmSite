@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.couponmen.dao.MallPromotionActivityCouponMensendDetailDao">
+    
+	<sql id="mallPromotionActivityCouponMensendDetailColumns">
+		a.detail_id AS "detailId",
+		a.mensend_id AS "mensendId",
+		a.coupon_code AS "couponCode",
+		a.coupon_s_name AS "couponSName"
+	</sql>
+	
+	<sql id="mallPromotionActivityCouponMensendDetailJoins">
+	</sql>
+    
+	<select id="get" resultType="MallPromotionActivityCouponMensendDetail">
+		SELECT 
+			<include refid="mallPromotionActivityCouponMensendDetailColumns"/>
+		FROM mall_promotion_activity_coupon_mensend_detail a
+		<include refid="mallPromotionActivityCouponMensendDetailJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MallPromotionActivityCouponMensendDetail">
+		SELECT 
+			<include refid="mallPromotionActivityCouponMensendDetailColumns"/>
+		FROM mall_promotion_activity_coupon_mensend_detail a
+		<include refid="mallPromotionActivityCouponMensendDetailJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MallPromotionActivityCouponMensendDetail">
+		SELECT 
+			<include refid="mallPromotionActivityCouponMensendDetailColumns"/>
+		FROM mall_promotion_activity_coupon_mensend_detail a
+		<include refid="mallPromotionActivityCouponMensendDetailJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_promotion_activity_coupon_mensend_detail(
+			detail_id,
+			mensend_id,
+			coupon_code,
+			coupon_s_name
+		) VALUES (
+			#{detailId},
+			#{mensendId},
+			#{couponCode},
+			#{couponSName}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_promotion_activity_coupon_mensend_detail SET 	
+			detail_id = #{detailId},
+			mensend_id = #{mensendId},
+			coupon_code = #{couponCode},
+			coupon_s_name = #{couponSName}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_promotion_activity_coupon_mensend_detail
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

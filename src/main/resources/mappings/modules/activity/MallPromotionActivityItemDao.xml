@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.activity.dao.MallPromotionActivityItemDao">
+    
+	<sql id="mallPromotionActivityInfoColumns">
+		a.activity_id AS "activityId",
+		a.activity_code AS "activityCode",
+		a.activity_theme AS "activityTheme",
+		a.activity_type AS "activityType",
+		a.activity_name AS "activityName",
+		a.activity_s_name AS "activitySName",
+		a.start_time AS "startTime",
+		a.end_time AS "endTime",
+		a.activity_desc AS "activityDesc",
+		a.range_type AS "rangeType",
+		a.create_by AS "createName",
+		a.create_code AS "createCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="mallPromotionActivityItemInfoColumns">
+		a.activity_id AS "activityId",
+		a.activity_code AS "activityCode",
+		a.activity_theme AS "activityTheme",
+		a.activity_type AS "activityType",
+		a.activity_name AS "activityName",
+		a.activity_s_name AS "activitySName",
+		a.start_time AS "startTime",
+		a.end_time AS "endTime",
+		a.activity_desc AS "activityDesc",
+		a.range_type AS "rangeType",
+		a.create_by AS "createName",
+		a.create_code AS "createCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		b.activity_item_id AS "activityItemId",
+		b.activity_item_type AS "activityItemType",
+		b.activity_item_value AS "activityItemValue",
+		b.restriction_type AS "restrictionType",
+		b.restriction_value AS "restrictionValue"
+	</sql>
+	
+	<sql id="mallPromotionActivityItemInfoJoins">
+	</sql>
+    
+    <select id="getSpActivity" resultType="mallPromotionActivityInfo">
+		SELECT 
+			<include refid="mallPromotionActivityItemInfoColumns"/>
+		FROM mall_promotion_activity_item_info b,mall_promotion_activity_info a
+		<include refid="mallPromotionActivityItemInfoJoins"/>
+		WHERE a.activity_id = #{id} and a.activity_id = b.activity_id and a.activity_type = 'item'
+	</select>
+    
+	<select id="get" resultType="mallPromotionActivityInfo">
+		SELECT 
+			<include refid="mallPromotionActivityItemInfoColumns"/>
+		FROM mall_promotion_activity_item_info b,mall_promotion_activity_info a
+		<include refid="mallPromotionActivityItemInfoJoins"/>
+		WHERE b.activity_item_info_id = #{id} and a.activity_id = b.activity_id
+	</select>
+	
+	<select id="findSpList" resultType="MallPromotionActivityInfo">
+		SELECT 
+			<include refid="mallPromotionActivityInfoColumns"/>
+			,case  when a.status=1  and a.end_time is not NULL and a.end_time&lt;=now()  then '2'
+ 		else  a.status end as 'status'			
+		
+		FROM mall_promotion_activity_info a,mall_promotion_activity_item_info b
+		<where>
+			a.del_flag = 0 and a.activity_id = b.activity_id 
+			<if test="activityId != null and activityId != ''">
+				AND a.activity_id = #{activityId}
+			</if>
+			<if test="activityCode != null and activityCode != ''">
+				AND a.activity_code like concat('%',#{activityCode},'%') 
+			</if>
+			<if test="activityTheme != null and activityTheme != ''">
+				AND a.activity_theme = #{activityTheme}
+			</if>
+			<if test="activityType != null and activityType != ''">
+				AND a.activity_type = #{activityType}
+			</if>
+			<if test="activityName != null and activityName != ''">
+				AND a.activity_name like concat('%',#{activityName},'%') 
+			</if>
+			<if test="activitySName != null and activitySName != ''">
+				AND a.activity_s_name like concat('%',#{activitySName},'%') 
+			</if>
+			<if test="startTime != null and startTime != ''">
+				AND a.end_time > #{startTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				AND a.start_time &lt; #{endTime}
+			</if>
+			<if test="activityDesc != null and activityDesc != ''">
+				AND a.activity_desc = #{activityDesc}
+			</if>
+			<if test="rangeType != null and rangeType != ''">
+				AND a.range_type = #{rangeType}
+			</if>
+			<if test="status != null and status !='' or status==0" >	
+				<choose>
+					<when test="status == 2">
+						AND a.status = 1 and a.end_time &lt; NOW()
+					</when>
+					<when test="status == 1">
+						AND a.status = 1 and a.end_time &gt; NOW()
+					</when>
+					<otherwise>
+						AND a.status = #{status}
+					</otherwise>
+				</choose>
+			</if>
+
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.status desc,a.create_date desc,a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findList" resultType="mallPromotionActivityItemInfo">
+		SELECT 
+			<include refid="mallPromotionActivityItemInfoColumns"/>
+			,case  when a.status=1  and a.end_time is not NULL and a.end_time&lt;=now()  then '2'
+ 		else  a.status end as 'status'			
+		
+		FROM mall_promotion_activity_info a,mall_promotion_activity_item_info b
+		<where>
+			a.del_flag = 0 and a.activity_id = b.activity_id 
+			<if test="activityId != null and activityId != ''">
+				AND a.activity_id = #{activityId}
+			</if>
+			<if test="activityCode != null and activityCode != ''">
+				AND a.activity_code like concat('%',#{activityCode},'%') 
+			</if>
+			<if test="activityTheme != null and activityTheme != ''">
+				AND a.activity_theme = #{activityTheme}
+			</if>
+			<if test="activityType != null and activityType != ''">
+				AND a.activity_type = #{activityType}
+			</if>
+			<if test="activityName != null and activityName != ''">
+				AND a.activity_name like concat('%',#{activityName},'%') 
+			</if>
+			<if test="activitySName != null and activitySName != ''">
+				AND a.activity_s_name like concat('%',#{activitySName},'%') 
+			</if>
+			<if test="startTime != null and startTime != ''">
+				AND a.end_time > #{startTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				AND a.start_time &lt; #{endTime}
+			</if>
+			<if test="activityDesc != null and activityDesc != ''">
+				AND a.activity_desc = #{activityDesc}
+			</if>
+			<if test="rangeType != null and rangeType != ''">
+				AND a.range_type = #{rangeType}
+			</if>
+			<if test="status != null and status !='' or status==0" >	
+				<choose>
+					<when test="status == 2">
+						AND a.status = 1 and a.end_time &lt; NOW()
+					</when>
+					<when test="status == 1">
+						AND a.status = 1 and a.end_time &gt; NOW()
+					</when>
+					<otherwise>
+						AND a.status = #{status}
+					</otherwise>
+				</choose>
+			</if>
+
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.status desc,a.create_date desc,a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="mallPromotionActivityItemInfo">
+		SELECT 
+			<include refid="mallPromotionActivityItemInfoColumns"/>
+		FROM mall_promotion_activity_item_info a
+		<include refid="mallPromotionActivityItemInfoJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_promotion_activity_item_info(
+			activity_item_id,
+			activity_id,
+			ACTIVITY_ITEM_TYPE,
+			ACTIVITY_ITEM_VALUE,
+			RESTRICTION_TYPE,
+			RESTRICTION_VALUE
+		) VALUES (
+			#{activityItemId},
+			#{activityId},
+			#{activityItemType},
+			#{activityItemValue},
+			#{restrictionType},
+			#{restrictionValue}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_promotion_activity_item_info SET 	
+			activity_item_info_id = #{activityItemId},
+			activity_id = #{activityId},
+			condition_type = #{conditionType}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_promotion_activity_item_info
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

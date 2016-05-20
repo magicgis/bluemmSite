@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.hb.dao.MallWxRedpacketFileDetailsDao">
+    
+	<sql id="mallWxRedpacketFileDetailsColumns">
+		a.id AS "id",
+		a.fileid AS "fileid",
+		a.merchant_order_no AS "merchantOrderNo",
+		a.redpacket_no AS "redpacketNo",
+		a.referrer_no AS "referrerNo",
+		a.referrer_name AS "referrerName",
+		a.user_openid AS "userOpenid",
+		a.redpacket__amount_yuan AS "redpacketAmountYuan",
+		a.redpacket__amount_fen AS "redpacketAmountFen",
+		a.redpacket__min_amount AS "redpacketMinAmount",
+		a.redpacket__max_amount AS "redpacketMaxAmount",
+		a.send_total_people AS "sendTotalPeople",
+		a.redpacket__greetings AS "redpacketGreetings",
+		a.hd_name AS "hdName",
+		a.marker AS "marker"
+	</sql>
+	
+	<sql id="mallWxRedpacketFileDetailsJoins">
+	</sql>
+    
+	<select id="get" resultType="MallWxRedpacketFileDetails">
+		SELECT 
+			<include refid="mallWxRedpacketFileDetailsColumns"/>
+		FROM mall_wx_redpacket_file_details a
+		<include refid="mallWxRedpacketFileDetailsJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MallWxRedpacketFileDetails">
+		SELECT 
+			<include refid="mallWxRedpacketFileDetailsColumns"/>
+		FROM mall_wx_redpacket_file_details a
+		<include refid="mallWxRedpacketFileDetailsJoins"/>
+		<where>
+			<if test="fileid != null and fileid != ''">
+				AND a.fileid = #{fileid}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MallWxRedpacketFileDetails">
+		SELECT 
+			<include refid="mallWxRedpacketFileDetailsColumns"/>
+		FROM mall_wx_redpacket_file_details a
+		<include refid="mallWxRedpacketFileDetailsJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_wx_redpacket_file_details(
+			id,
+			fileid,
+			merchant_order_no,
+			redpacket_no,
+			referrer_no,
+			referrer_name,
+			user_openid,
+			redpacket__amount_yuan,
+			redpacket__amount_fen,
+			redpacket__min_amount,
+			redpacket__max_amount,
+			send_total_people,
+			redpacket__greetings,
+			hd_name,
+			marker
+		) VALUES (
+			#{id},
+			#{fileid},
+			#{merchantOrderNo},
+			#{redpacketNo},
+			#{referrerNo},
+			#{referrerName},
+			#{userOpenid},
+			#{redpacketAmountYuan},
+			#{redpacketAmountFen},
+			#{redpacketMinAmount},
+			#{redpacketMaxAmount},
+			#{sendTotalPeople},
+			#{redpacketGreetings},
+			#{hdName},
+			#{marker}
+		)
+	</insert>
+	
+	<select id="findListNum" resultType="Integer">
+		SELECT 
+			count(1)
+		FROM mall_wx_redpacket_file_details a
+		<where>
+			<if test="fileid != null and fileid != ''">
+				AND a.fileid = #{fileid}
+			</if>
+		</where>
+	</select>
+	
+	<select id="isExist" resultType="Integer">
+		SELECT 
+			count(1)
+		FROM mall_wx_redpacket_file_details a
+		<where>
+			a.redpacket_no in (${redpacketNo})
+			<if test="fileid != null and fileid != ''">
+<!-- 				AND a.fileid = ${fileid} -->
+			</if>
+		</where>
+	</select>
+	
+	<update id="update">
+		UPDATE mall_wx_redpacket_file_details SET 	
+			fileid = #{fileid},
+			merchant_order_no = #{merchantOrderNo},
+			redpacket_no = #{redpacketNo},
+			referrer_no = #{referrerNo},
+			referrer_name = #{referrerName},
+			user_openid = #{userOpenid},
+			redpacket__amount_yuan = #{redpacketAmountYuan},
+			redpacket__amount_fen = #{redpacketAmountFen},
+			redpacket__min_amount = #{redpacketMinAmount},
+			redpacket__max_amount = #{redpacketMaxAmount},
+			send_total_people = #{sendTotalPeople},
+			redpacket__greetings = #{redpacketGreetings},
+			hd_name = #{hdName},
+			marker = #{marker}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_wx_redpacket_file_details
+		WHERE fileid = #{fileid}
+	</update>
+	
+	<update id="updateOrderNo">
+		UPDATE mall_wx_redpacket_file_details SET 	
+			merchant_order_no = #{merchantOrderNo}
+		WHERE fileid = #{fileid} and redpacket_no = #{redpacketNo}
+	</update>
+	
+	<delete id="delFileDetailByFileid">
+		delete from mall_wx_redpacket_file_details 
+		where fileid = #{fileid} 
+	</delete>
+</mapper>

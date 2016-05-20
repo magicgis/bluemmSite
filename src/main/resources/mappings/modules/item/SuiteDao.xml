@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.item.dao.SuiteDao">
+	
+	<sql id="selectSuiteId">
+		suite_id AS suiteId,
+		suite_name AS suiteName,
+		suite_sku AS suiteSku,
+		market_price AS marketPrice,
+		pic_url AS picUrl,
+		is_parent AS isParent,
+		status,
+		type
+	</sql>
+
+	<select id="findList" resultType="cn.com.bluemoon.jeesite.modules.item.entity.MallItemSuite">
+		SELECT
+			<include refid="selectSuiteId" />
+		FROM
+			mall_item_suite
+			where status = 1
+		<if test="suiteSku != null and suiteSku != ''">
+		and suite_sku like '%${suiteSku}%'
+		</if>
+		<if test="suiteName != null and suiteName != ''">
+		and suite_name like '%${suiteName}%'
+		</if>
+	</select>
+	
+</mapper>

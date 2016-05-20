@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.activity.dao.MallPromotionActivityCouponLevelDao">
+    
+	<sql id="mallPromotionActivityCouponLevelColumns">
+		a.coupon_level_id AS "couponLevelId",
+		a.activity_id AS "activityId",
+		a.level AS "level",
+		a.condition_value AS "conditionValue"
+	</sql>
+	
+	<sql id="mallPromotionActivityCouponLevelJoins">
+	</sql>
+    
+	<select id="get" resultType="MallPromotionActivityCouponLevel">
+		SELECT 
+			<include refid="mallPromotionActivityCouponLevelColumns"/>
+		FROM mall_promotion_activity_coupon_level a
+		<include refid="mallPromotionActivityCouponLevelJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MallPromotionActivityCouponLevel">
+		SELECT 
+			<include refid="mallPromotionActivityCouponLevelColumns"/>
+		FROM mall_promotion_activity_coupon_level a
+		<include refid="mallPromotionActivityCouponLevelJoins"/>
+		<where>
+			<if test="activityId != null and activityId != ''">
+				AND a.activity_id = #{activityId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MallPromotionActivityCouponLevel">
+		SELECT 
+			<include refid="mallPromotionActivityCouponLevelColumns"/>
+		FROM mall_promotion_activity_coupon_level a
+		<include refid="mallPromotionActivityCouponLevelJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_promotion_activity_coupon_level(
+			coupon_level_id,
+			activity_id,
+			level,
+			condition_value
+		) VALUES (
+			#{couponLevelId},
+			#{activityId},
+			#{level},
+			#{conditionValue}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_promotion_activity_coupon_level SET 	
+			coupon_level_id = #{couponLevelId},
+			activity_id = #{activityId},
+			level = #{level},
+			condition_value = #{conditionValue}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_promotion_activity_coupon_level
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

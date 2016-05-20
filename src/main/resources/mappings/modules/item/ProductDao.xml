@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.item.dao.ProductDao">
+	
+	<sql id="mallProductInfoColumns">
+		a.product_id AS "productId",
+		a.product_sku AS "productSku",
+		a.product_name AS "productName",
+		a.bar_code AS "barCode",
+		a.market_price AS "marketPrice",
+		a.carton AS "carton",
+		a.pic_url AS "picUrl",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_time AS "createTime",
+		a.modify_by AS "modifyBy",
+		a.modify_time AS "modifyTime",
+		a.type as type
+	</sql>
+	
+	<sql id="mallProductInfoJoins">
+	</sql>
+    
+	<select id="get" resultType="cn.com.bluemoon.jeesite.modules.item.entity.MallProductInfo">
+		SELECT 
+			<include refid="mallProductInfoColumns"/>
+		FROM mall_product_info a
+		<include refid="mallProductInfoJoins"/>
+		WHERE a.product_id = #{productId}
+	</select>
+	
+	<select id="getById" parameterType="string" resultType="cn.com.bluemoon.jeesite.modules.item.entity.MallProductInfo">
+		SELECT 
+			<include refid="mallProductInfoColumns"/>
+		FROM mall_product_info a
+		<include refid="mallProductInfoJoins"/>
+		WHERE a.product_id = #{productId}
+	</select>
+	
+	<select id="findList" resultType="cn.com.bluemoon.jeesite.modules.item.entity.MallProductInfo">
+		SELECT 
+			<include refid="mallProductInfoColumns"/>
+		FROM mall_product_info a
+		<include refid="mallProductInfoJoins"/>
+		<where>
+			status='1' 
+			<if test="productSku != null and productSku != ''">
+				AND a.product_sku LIKE 
+					<if test="dbName == 'oracle'">'%'||#{productSku}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{productSku}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{productSku},'%')</if>
+			</if>
+			<if test="productName != null and productName != ''">
+				AND a.product_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{productName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{productName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{productName},'%')</if>
+			</if>
+			<if test="marketPrice != null and marketPrice != ''">
+				AND a.market_price = #{marketPrice}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.modify_time desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="cn.com.bluemoon.jeesite.modules.item.entity.MallProductInfo">
+		SELECT 
+			<include refid="mallProductInfoColumns"/>
+		FROM mall_product_info a
+		<include refid="mallProductInfoJoins"/>
+		<where>
+			status = '1'
+			<if test="productSku != null and productSku != ''">
+				<choose>
+					<when test="productId !=null and productId != ''">
+						and a.product_sku = #{productSku} and a.product_id != #{productId}
+					</when>
+					<otherwise>
+						and a.product_sku = #{productSku}
+					</otherwise>
+				</choose>
+			</if>
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_product_info(
+			product_id,
+			product_sku,
+			product_name,
+			bar_code,
+			market_price,
+			carton,
+			pic_url,
+			status,
+			create_by,
+			create_time,
+			modify_by,
+			modify_time,
+			type
+		) VALUES (
+			#{productId},
+			#{productSku},
+			#{productName},
+			#{barCode},
+			#{marketPrice},
+			#{carton},
+			#{picUrl},
+			#{status},
+			#{createBy.name},#{createDate},#{updateBy.name},#{updateDate},
+			#{type}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_product_info SET 	
+			product_sku = #{productSku},
+			product_name = #{productName},
+			bar_code = #{barCode},
+			market_price = #{marketPrice},
+			carton = #{carton},
+			pic_url = #{picUrl},
+			status = #{status},
+			modify_by = #{updateBy.name},
+			modify_time = #{updateDate},
+			type=#{type}
+		WHERE product_id = #{productId}
+	</update>
+	
+	<update id="delete">
+		UPDATE mall_product_info SET 	
+			status = #{status},
+			modify_by = #{updateBy.name},
+			modify_time = #{updateDate} 
+		WHERE product_id = #{productId}
+	</update>
+	
+</mapper>

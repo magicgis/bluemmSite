@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.hb.dao.MallWxRedpacketExcelDao">
+    
+	<sql id="mallWxRedpacketExcelColumns">
+		a.id AS "id",
+		a.clientpath AS "clientpath",
+		a.clientfilename AS "clientfilename",
+		a.serverfilepath AS "serverfilepath",
+		a.serverfilename AS "serverfilename",
+		a.uploaduser AS "uploaduser",
+		a.uploadtime AS "uploadtime",
+		a.isdeleted AS "isdeleted",
+		a.operator AS "operator",
+		a.operatetime AS "operatetime"
+	</sql>
+	
+	<sql id="mallWxRedpacketExcelJoins">
+	</sql>
+    
+	<select id="get" resultType="MallWxRedpacketExcel">
+		SELECT 
+			<include refid="mallWxRedpacketExcelColumns"/>
+		FROM mall_wx_redpacket_excel a
+		<include refid="mallWxRedpacketExcelJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MallWxRedpacketExcel">
+		SELECT 
+			<include refid="mallWxRedpacketExcelColumns"/>
+		FROM mall_wx_redpacket_excel a
+		<include refid="mallWxRedpacketExcelJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MallWxRedpacketExcel">
+		SELECT 
+			<include refid="mallWxRedpacketExcelColumns"/>
+		FROM mall_wx_redpacket_excel a
+		<include refid="mallWxRedpacketExcelJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_wx_redpacket_excel(
+			id,
+			clientpath,
+			clientfilename,
+			serverfilepath,
+			serverfilename,
+			uploaduser,
+			uploadtime,
+			isdeleted,
+			operator,
+			operatetime
+		) VALUES (
+			#{id},
+			#{clientpath},
+			#{clientfilename},
+			#{serverfilepath},
+			#{serverfilename},
+			#{uploaduser},
+			#{uploadtime},
+			#{isdeleted},
+			#{operator},
+			#{operatetime}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_wx_redpacket_excel SET 	
+			clientpath = #{clientpath},
+			clientfilename = #{clientfilename},
+			serverfilepath = #{serverfilepath},
+			serverfilename = #{serverfilename},
+			uploaduser = #{uploaduser},
+			uploadtime = #{uploadtime},
+			isdeleted = #{isdeleted},
+			operator = #{operator},
+			operatetime = #{operatetime}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_wx_redpacket_excel
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

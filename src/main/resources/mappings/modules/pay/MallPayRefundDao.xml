@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.pay.dao.MallPayRefundDao">
+    
+	<sql id="mallPayRefundColumns">
+		a.id AS "id",
+		a.out_trade_no AS "outTradeNo",
+		a.pay_platform AS "payPlatform",
+		a.create_time AS "createTime",
+		a.pay_time AS "payTime",
+		a.transaction_id AS "transactionId",
+		a.pay_status AS "payStatus",
+		a.total_fee AS "totalFee",
+		a.response_msg AS "responseMsg",
+		a.validate AS "validate",
+		a.trans_code_msg AS "transCodeMsg",
+		a.return_msg AS "returnMsg",
+		a.data_date AS "dataDate",
+		a.trade_type AS "tradeType"
+	</sql>
+	
+	<sql id="mallPayRefundJoins">
+	</sql>
+    
+	<select id="get" resultType="MallPayRefund">
+		SELECT 
+			<include refid="mallPayRefundColumns"/>
+		FROM mall_pay_refund a
+		<include refid="mallPayRefundJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MallPayRefund">
+		SELECT 
+			<include refid="mallPayRefundColumns"/>
+		FROM mall_pay_refund a
+		<include refid="mallPayRefundJoins"/>
+		<where>
+			
+			<if test="outTradeNo != null and outTradeNo != ''">
+				AND a.out_trade_no LIKE 
+					<if test="dbName == 'oracle'">'%'||#{outTradeNo}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{outTradeNo}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{outTradeNo},'%')</if>
+			</if>
+			<if test="payPlatform != null and payPlatform != ''">
+				AND a.pay_platform = #{payPlatform}
+			</if>
+			<if test="createTime != null and createTime != ''">
+				AND a.create_time = #{createTime}
+			</if>
+			<if test="payTime != null and payTime != ''">
+				AND a.pay_time = #{payTime}
+			</if>
+			<if test="payStatus != null and payStatus != ''">
+				AND a.pay_status = #{payStatus}
+			</if>
+			<if test="validate != null and validate != ''">
+				AND a.validate = #{validate}
+			</if>
+			<if test="payTime1 != null and payTime1 != ''">
+				AND a.pay_time >= #{payTime1}
+			</if>
+			<if test="payTime2 != null and payTime2 != ''">
+				AND a.pay_time <![CDATA[ < ]]> #{payTime2}
+			</if>
+			
+			<if test="totalFee1 != null and totalFee1 != ''">
+				AND a.total_fee >= (#{totalFee1}*100)
+			</if>
+			<if test="totalFee2 != null and totalFee2 != ''">
+				AND a.total_fee <![CDATA[ < ]]> (#{totalFee2}*100)
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MallPayRefund">
+		SELECT 
+			<include refid="mallPayRefundColumns"/>
+		FROM mall_pay_refund a
+		<include refid="mallPayRefundJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_pay_refund(
+			id,
+			out_trade_no,
+			pay_platform,
+			create_time,
+			pay_time,
+			transaction_id,
+			pay_status,
+			total_fee,
+			response_msg,
+			validate,
+			trans_code_msg,
+			return_msg,
+			data_date,
+			trade_type
+		) VALUES (
+			#{id},
+			#{outTradeNo},
+			#{payPlatform},
+			#{createTime},
+			#{payTime},
+			#{transactionId},
+			#{payStatus},
+			#{totalFee},
+			#{responseMsg},
+			#{validate},
+			#{transCodeMsg},
+			#{returnMsg},
+			#{dataDate},
+			#{tradeType}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_pay_refund SET 	
+			id = #{id},
+			out_trade_no = #{outTradeNo},
+			pay_platform = #{payPlatform},
+			create_time = #{createTime},
+			pay_time = #{payTime},
+			transaction_id = #{transactionId},
+			pay_status = #{payStatus},
+			total_fee = #{totalFee},
+			response_msg = #{responseMsg},
+			validate = #{validate},
+			trans_code_msg = #{transCodeMsg},
+			return_msg = #{returnMsg},
+			data_date = #{dataDate},
+			trade_type = #{tradeType}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_pay_refund
+		WHERE id = #{id}
+	</update>
+	
+	
+	
+	
+	<select id="findListByOutTradeNos" parameterType="string" resultType="MallPayRefund">
+		SELECT 
+			<include refid="mallPayRefundColumns"/>
+		FROM mall_pay_refund a
+		where out_trade_no in (${outTradeNos}) ORDER BY create_time asc
+	</select>
+	
+	
+	<select id="findListByTransactionIds" parameterType="string" resultType="MallPayRefund">
+		SELECT 
+			<include refid="mallPayRefundColumns"/>
+		FROM mall_pay_refund a
+		where transaction_id in (${transactionIds}) ORDER BY create_time asc
+	</select>
+	
+	
+	<select id="findListByTransCodeMsg" parameterType="string" resultType="MallPayRefund">
+		SELECT 
+			<include refid="mallPayRefundColumns"/>
+		FROM mall_pay_refund a
+		where trans_code_msg = ${transCodeMsg} ORDER BY create_time asc
+	</select>
+	
+	
+	<update id="updateValidateByOutTradeNo" parameterType="string">
+		UPDATE mall_pay_refund SET 
+			PAY_STATUS = #{payStatus}, VALIDATE=#{validate}
+		WHERE OUT_TRADE_NO = #{outTradeNo}
+	</update>
+
+	
+</mapper>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.sys.dao.MallSysLogInfoDao">
+   
+	<!--   -->
+	<sql id="mallSysLogInfoColumns">
+		a.log_id AS "logId",
+		a.module AS "module",
+		a.oper_time AS "operTime",
+		a.user_ip AS "userIp",
+		a.cuid AS "cuid",
+		a.client_type AS "clientType",
+		a.methods AS "methods",
+		a.description AS "description",
+		a.broswer AS "broswer",
+		a.user_id AS "userId",
+		a.version AS "version"
+	</sql>
+	
+	<select id="findList" resultType="MallSysLogInfo">
+		SELECT 
+			<include refid="mallSysLogInfoColumns"/>
+		FROM mall_sys_log_info a
+		<where>
+			
+			<if test="module != null and module != ''">
+				AND a.module = #{module}
+			</if>
+			<if test="beginOperTime != null and endOperTime != null and beginOperTime != '' and endOperTime != ''">
+				AND a.oper_time BETWEEN #{beginOperTime} AND #{endOperTime}
+			</if>
+			<if test="cuid != null and cuid != ''">
+				AND a.cuid = #{cuid}
+			</if>
+			<if test="clientType != null and clientType != ''">
+				AND a.client_type = #{clientType}
+			</if>
+		</where>
+		ORDER BY operTime DESC
+	</select>
+	
+	
+</mapper>

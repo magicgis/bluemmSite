@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.item.dao.ItemCategoryDao">
+	<!--mybatis ehcache缓存配置 -->
+	<!-- 以下两个<cache>标签二选一,第一个可以输出日志,第二个不输出日志 <cache type="org.mybatis.caches.ehcache.LoggingEhcache" 
+		/> -->
+	<!-- <cache type="org.mybatis.caches.ehcache.EhcacheCache"/> -->
+	<!-- 以下与实体类的中字段一致 -->
+	
+	<!-- 如果是 sqlserver， 可以替换以下的  -->
+		<!-- (select name+',' from mall_admin_role  where mall_admin_role.id in (SELECT roleId FROM mall_admin_user_role WHERE userId=mall_admin_user.id) FOR XML PATH('') ) roleName, -->
+	<sql id="mallCategoryItemSQL">
+			ci_id, 
+			cid, 
+			item_id,
+			category_position, 
+			status, 
+			create_by, 
+			create_time, 
+			modify_by, 
+			modify_time
+	</sql>
+	<select id="findByPosition" resultType="cn.com.bluemoon.jeesite.modules.item.entity.MallCategoryItem">
+		select 
+			<include refid="mallCategoryItemSQL" />
+		from mall_category_item a
+		<where>
+			a.STATUS = 1 
+			<if test="cid != null and cid != ''">
+				AND cid = #{cid}
+			</if>
+			<if test="categoryPosition != null and categoryPosition != '' and categoryPosition != 0">
+				and a.category_position = #{categoryPosition}
+			</if>
+			<if test="itemId != null and itemId != ''">
+				and a.item_id != #{itemId}
+			</if>
+		</where>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_category_item(
+			ci_id, 
+			cid, 
+			item_id,
+			category_position, 
+			status, 
+			create_by, 
+			create_time, 
+			modify_by, 
+			modify_time
+		) VALUES (
+			#{ciId}, 
+			#{cid}, 
+			#{itemId},  
+			#{categoryPosition},
+			#{status},  
+			#{createBy.name},  
+			#{createDate},  
+			#{updateBy.name},  
+			#{updateDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_category_item SET 	
+			cid = #{cid},
+			category_position = #{categoryPosition},
+			status = #{status},
+			modify_by = #{updateBy.name},
+			modify_time = #{updateDate}
+		WHERE item_id = #{itemId}
+	</update>
+	
+	<update id="updatePosition">
+		UPDATE mall_category_item SET 	
+			category_position = category_position+1
+		WHERE STATUS=1 
+		AND cid = #{cid}
+		AND category_position >= #{categoryPosition}
+	</update>
+</mapper>

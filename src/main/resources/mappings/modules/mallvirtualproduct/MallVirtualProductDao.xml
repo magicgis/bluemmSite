@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.mallvirtualproduct.dao.MallVirtualProductDao">
+    
+	<sql id="mallVirtualProductColumns">
+		a.vp_id AS "vpId",
+		a.vp_sku AS "vpSku",
+		a.vp_name AS "vpName",
+		a.market_price AS "marketPrice",
+		a.pic_url AS "picUrl",
+		a.type AS "type",
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_time AS "createTime",
+		a.modify_by AS "modifyBy",
+		a.modify_time AS "modifyTime"
+	</sql>
+	
+	<sql id="mallVirtualProductJoins">
+	</sql>
+    
+	<select id="get" resultType="MallVirtualProduct">
+		SELECT 
+			<include refid="mallVirtualProductColumns"/>
+		FROM mall_virtual_product a
+		<include refid="mallVirtualProductJoins"/>
+		WHERE a.vp_id = #{vpId}
+	</select>
+	
+	<select id="findList" resultType="MallVirtualProduct">
+		SELECT 
+			<include refid="mallVirtualProductColumns"/>
+		FROM mall_virtual_product a
+		<include refid="mallVirtualProductJoins"/>
+		<where>
+			a.status = '1'
+			<if test="vpSku != null and vpSku != ''">
+				AND a.vp_sku LIKE 
+					<if test="dbName == 'oracle'">'%'||#{vpSku}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{vpSku}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{vpSku},'%')</if>
+			</if>
+			<if test="vpName != null and vpName != ''">
+				AND a.vp_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{vpName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{vpName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{vpName},'%')</if>
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY modify_time desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MallVirtualProduct">
+		SELECT 
+			<include refid="mallVirtualProductColumns"/>
+		FROM mall_virtual_product a
+		<include refid="mallVirtualProductJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_virtual_product(
+			vp_id,
+			vp_sku,
+			vp_name,
+			market_price,
+			pic_url,
+			type,
+			status,
+			create_by,
+			create_time,
+			modify_by,
+			modify_time
+		) VALUES (
+			#{id},
+			#{vpSku},
+			#{vpName},
+			#{marketPrice},
+			#{picUrl},
+			#{type},
+			#{status},
+			#{createBy.name},
+			#{createDate},
+			#{updateBy.name},
+			#{updateDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_virtual_product SET 	
+			vp_sku = #{vpSku},
+			vp_name = #{vpName},
+			market_price = #{marketPrice},
+			pic_url = #{picUrl},
+			type = #{type},
+			status = #{status},
+			modify_by = #{updateBy.name},
+			modify_time = #{updateDate}
+		WHERE vp_id = #{vpId}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_virtual_product
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

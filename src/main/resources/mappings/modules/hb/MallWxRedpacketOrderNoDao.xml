@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.hb.dao.MallWxRedpacketOrderNoDao">
+    
+	<sql id="mallWxRedpacketOrderNoColumns">
+		a.applydate AS "applydate",
+		a.no AS "no",
+		a.type AS "type",
+		a.isdeleted AS "isdeleted",
+		a.operator AS "operator",
+		a.operatortime AS "operatortime"
+	</sql>
+	
+	<sql id="mallWxRedpacketOrderNoJoins">
+	</sql>
+    
+	<select id="get" resultType="MallWxRedpacketOrderNo">
+		SELECT 
+			<include refid="mallWxRedpacketOrderNoColumns"/>
+		FROM mall_wx_redpacket_order_no a
+		<include refid="mallWxRedpacketOrderNoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MallWxRedpacketOrderNo">
+		SELECT 
+			<include refid="mallWxRedpacketOrderNoColumns"/>
+		FROM mall_wx_redpacket_order_no a
+		<include refid="mallWxRedpacketOrderNoJoins"/>
+		<where>
+			<if test="applydate != null and applydate != ''">
+				AND a.applydate = #{applydate}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+			<if test="isdeleted != null and isdeleted != ''">
+				AND a.isdeleted = #{isdeleted}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MallWxRedpacketOrderNo">
+		SELECT 
+			<include refid="mallWxRedpacketOrderNoColumns"/>
+		FROM mall_wx_redpacket_order_no a
+		<include refid="mallWxRedpacketOrderNoJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_wx_redpacket_order_no(
+			applydate,
+			no,
+			type,
+			isdeleted,
+			operator,
+			operatortime
+		) VALUES (
+			#{applydate},
+			#{no},
+			#{type},
+			#{isdeleted},
+			#{operator},
+			#{operatortime}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_wx_redpacket_order_no SET 	
+			no = #{no},
+			isdeleted = #{isdeleted},
+			operator = #{operator},
+			operatortime = #{operatortime}
+		WHERE type = #{type} and applydate = #{applydate}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_wx_redpacket_order_no
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

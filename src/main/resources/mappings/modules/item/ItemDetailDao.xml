@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.item.dao.ItemDetailDao">
+	<!--mybatis ehcache缓存配置 -->
+	<!-- 以下两个<cache>标签二选一,第一个可以输出日志,第二个不输出日志 <cache type="org.mybatis.caches.ehcache.LoggingEhcache" 
+		/> -->
+	<!-- <cache type="org.mybatis.caches.ehcache.EhcacheCache"/> -->
+	<!-- 以下与实体类的中字段一致 -->
+	
+	<!-- 如果是 sqlserver， 可以替换以下的  -->
+		<!-- (select name+',' from mall_admin_role  where mall_admin_role.id in (SELECT roleId FROM mall_admin_user_role WHERE userId=mall_admin_user.id) FOR XML PATH('') ) roleName, -->
+	
+	<insert id="insert">
+		INSERT INTO mall_item_detail(
+			detail_id, 
+			item_id, 
+			good_id, 
+			good_type, 
+			price, 
+			num, 
+			create_by, 
+			create_time
+		) VALUES (
+			#{detailId}, 
+			#{itemId}, 
+			#{goodId},  
+			#{goodType},
+			#{price},
+			#{num},  
+			#{createBy.name},  
+			#{createDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_item_detail SET 	
+			item_id = #{itemId},
+			good_id = #{goodId},
+			good_type = #{goodType},
+			price = #{price},
+			num = #{num}
+		WHERE detail_id = #{detailId}
+	</update>
+	
+	
+	<delete id="delete" >
+		delete from mall_item_detail where item_id = #{itemId}
+	</delete>
+</mapper>

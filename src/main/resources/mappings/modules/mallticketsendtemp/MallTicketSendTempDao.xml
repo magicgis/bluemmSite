@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.mallticketsendtemp.dao.MallTicketSendTempDao">
+    
+	<sql id="mallTicketSendTempColumns">
+		a.id AS "id",
+		a.mobile AS "mobile",
+		a.send_num AS "sendNum",
+		a.is_send AS "isSend",
+		a.type AS "type",
+		a.act_id as actId
+	</sql>
+	<sql id="otherColumns">
+		d.COUPON_S_NAME as couponSName,
+	</sql>
+	
+	<sql id="mallTicketSendTempJoins">
+		left JOIN mall_promotion_activity_info b ON a.act_id = b.ACTIVITY_CODE
+		left JOIN mall_promotion_activity_coupon_map c ON b.ACTIVITY_ID = c.ACTIVITY_ID
+		left JOIN mall_promotion_coupon_info d ON c.COUPON_ID = d.COUPON_ID
+	</sql>
+    
+	<select id="get" resultType="MallTicketSendTemp">
+		SELECT 
+			<include refid="mallTicketSendTempColumns"/>
+		FROM mall_ticket_send_temp a
+		<include refid="mallTicketSendTempJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MallTicketSendTemp">
+		SELECT 
+			<include refid="otherColumns"/>
+			<include refid="mallTicketSendTempColumns"/>
+		FROM mall_ticket_send_temp a
+		<include refid="mallTicketSendTempJoins"/>
+		<where>
+			
+			<if test="mobile != null and mobile != ''">
+				AND a.mobile LIKE 
+					<if test="dbName == 'oracle'">'%'||#{mobile}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{mobile}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{mobile},'%')</if>
+			</if>
+			<if test="isSend != null and isSend != ''">
+				AND a.is_send = #{isSend}
+			</if>
+			<if test="type != null and type != ''">
+				AND a.type = #{type}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_time desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MallTicketSendTemp">
+		SELECT 
+			<include refid="mallTicketSendTempColumns"/>
+		FROM mall_ticket_send_temp a
+		<include refid="mallTicketSendTempJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_ticket_send_temp(
+			id,
+			mobile,
+			send_num,
+			is_send,
+			act_id,
+			type
+		) VALUES (
+			#{id},
+			#{mobile},
+			#{sendNum},
+			#{isSend},
+			#{actId},
+			#{type}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_ticket_send_temp SET 	
+			mobile = #{mobile},
+			send_num = #{sendNum},
+			is_send = #{isSend}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_ticket_send_temp
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

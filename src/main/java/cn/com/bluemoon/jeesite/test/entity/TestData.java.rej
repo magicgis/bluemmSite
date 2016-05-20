@@ -1,0 +1,9 @@
+diff a/src/main/java/cn/com/bluemoon/jeesite/test/entity/TestData.java b/src/main/java/cn/com/bluemoon/jeesite/test/entity/TestData.java	(rejected hunks)
+@@ -35,6 +35,7 @@
+ 	private Date endInDate2;		// 结束 加入日期
+ 	
+ 	
++	public Date getBeginInDate2() {
+ 		return beginInDate2;
+ 	}
+ 

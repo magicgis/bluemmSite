@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.hb.dao.MallWxRedpacketSendinfoDao">
+    
+	<sql id="mallWxRedpacketSendinfoColumns">
+		a.mch_billno AS "mchBillno",
+		a.appid AS "appid",
+		a.mch_id AS "mchId",
+		a.redpackno AS "redpackno",
+		a.detail_id AS "detailId",
+		a.openid AS "openid",
+		a.referrer_no AS "referrerNo",
+		a.send_time AS "sendTime",
+		a.status AS "status",
+		a.reason AS "reason",
+		a.refund_amount AS "refundAmount",
+		a.refund_time AS "refundTime",
+		a.refund_resend_count AS "refundResendCount",
+		a.act_name AS "actName",
+		a.wishing AS "wishing",
+		a.total_amount AS "totalAmount",
+		a.total_num AS "totalNum",
+		a.hb_type AS "hbType",
+		a.send_type AS "sendType",
+		a.hblist AS "hblist",
+		a.amount AS "amount",
+		a.rcv_time AS "rcvTime",
+		a.remark AS "remark",
+		a.isdeleted AS "isdeleted",
+		a.operator AS "operator",
+		a.operatortime AS "operatortime"
+	</sql>
+	
+	<sql id="mallWxRedpacketSendinfoJoins">
+		 join mall_wx_redpacket_apply_details b on b.redpacket_no = a.redpackno
+	</sql>
+    
+	<select id="get" resultType="MallWxRedpacketSendinfo">
+		SELECT 
+			<include refid="mallWxRedpacketSendinfoColumns"/>
+		FROM mall_wx_redpacket_sendinfo a
+		<include refid="mallWxRedpacketSendinfoJoins"/>
+		WHERE a.mch_billno = #{mchBillno}
+	</select>
+	
+	<select id="findList" resultType="MallWxRedpacketSendinfo">
+		SELECT 
+			<include refid="mallWxRedpacketSendinfoColumns"/>
+			,b.applyid as "applyid" 
+		FROM mall_wx_redpacket_sendinfo a
+		<include refid="mallWxRedpacketSendinfoJoins"/>
+		<where>
+			<choose>
+				<when test="(status != null and status != '') 
+					or (openid != null and openid != '') 
+					or (appid != null and appid != '')
+					or (referrerNo != null and referrerNo != '')
+					or (applyid != null and applyid != '')
+					or (mchBillno != null and mchBillno != '')
+					or (detailId != null and detailId != '')
+					or (startTime != null and startTime != '')
+					or (startTime != null and startTime != '')">
+					<if test="status != null and status != ''">
+						AND a.status = #{status}
+					</if>
+					<if test="openid != null and openid != ''">
+						AND a.openid  like concat('%',#{openid},'%')
+					</if>
+					<if test="appid != null and appid != ''">
+						AND a.appid  like concat('%',#{appid},'%')
+					</if>
+					<if test="referrerNo != null and referrerNo != ''">
+						AND a.referrer_no like concat('%',#{referrerNo},'%') 
+					</if>
+					<if test="applyid != null and applyid != ''">
+						AND b.applyid  like concat('%',#{applyid},'%')
+					</if>
+					<if test="mchBillno != null and mchBillno != ''">
+						AND a.mch_billno like concat('%',#{mchBillno},'%') 
+					</if>
+					<if test="detailId != null and detailId != ''">
+						AND a.detail_id like concat('%',#{detailId},'%') 
+					</if>
+					<if test="startTime != null and startTime != ''">
+						AND a.send_time > #{startTime}
+					</if>
+					<if test="endTime != null and endTime != ''">
+						AND a.send_time &lt; #{endTime}
+					</if>
+				</when>
+				<otherwise>
+					0=1
+				</otherwise>
+			</choose>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.operatortime desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MallWxRedpacketSendinfo">
+		SELECT 
+			<include refid="mallWxRedpacketSendinfoColumns"/>
+		FROM mall_wx_redpacket_sendinfo a
+		<include refid="mallWxRedpacketSendinfoJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_wx_redpacket_sendinfo(
+			mch_billno,
+			appid,
+			mch_id,
+			redpackno,
+			detail_id,
+			openid,
+			referrer_no,
+			send_time,
+			status,
+			reason,
+			refund_amount,
+			refund_time,
+			refund_resend_count,
+			act_name,
+			wishing,
+			total_amount,
+			total_num,
+			hb_type,
+			send_type,
+			hblist,
+			amount,
+			rcv_time,
+			remark,
+			isdeleted,
+			operator,
+			operatortime
+		) VALUES (
+			#{mchBillno},
+			#{appid},
+			#{mchId},
+			#{redpackno},
+			#{detailId},
+			#{openid},
+			#{referrerNo},
+			#{sendTime},
+			#{status},
+			#{reason},
+			#{refundAmount},
+			#{refundTime},
+			#{refundResendCount},
+			#{actName},
+			#{wishing},
+			#{totalAmount},
+			#{totalNum},
+			#{hbType},
+			#{sendType},
+			#{hblist},
+			#{amount},
+			#{rcvTime},
+			#{remark},
+			#{isdeleted},
+			#{operator},
+			#{operatortime}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_wx_redpacket_sendinfo SET 	
+			appid = #{appid},
+			mch_id = #{mchId},
+			redpackno = #{redpackno},
+			detail_id = #{detailId},
+			openid = #{openid},
+			referrer_no = #{referrerNo},
+			send_time = #{sendTime},
+			status = #{status},
+			reason = #{reason},
+			refund_amount = #{refundAmount},
+			refund_time = #{refundTime},
+			refund_resend_count = #{refundResendCount},
+			act_name = #{actName},
+			wishing = #{wishing},
+			total_amount = #{totalAmount},
+			total_num = #{totalNum},
+			hb_type = #{hbType},
+			send_type = #{sendType},
+			hblist = #{hblist},
+			amount = #{amount},
+			rcv_time = #{rcvTime},
+			remark = #{remark},
+			isdeleted = #{isdeleted},
+			operator = #{operator},
+			operatortime = #{operatortime}
+		WHERE mch_billno = #{mchBillno}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_wx_redpacket_sendinfo
+		WHERE id = #{id}
+	</update>
+	
+	<select id="findByRedpackno" resultType="MallWxRedpacketSendinfo">
+		SELECT 
+			<include refid="mallWxRedpacketSendinfoColumns"/>
+		FROM mall_wx_redpacket_sendinfo a
+		<include refid="mallWxRedpacketSendinfoJoins"/>
+		<where>
+			<if test="applyid != null and applyid != ''">
+				AND a.applyid = #{applyid}
+			</if>
+			<if test="redpackno != null and redpackno != ''">
+				AND a.redpackno in (#{redpackno})
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+</mapper>

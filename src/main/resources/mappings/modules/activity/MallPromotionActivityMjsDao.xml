@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.activity.dao.MallPromotionActivityMjsDao">
+    
+	<sql id="mallPromotionActivityMjsColumns">
+		a.activity_mjs_id AS "activityMjsId",
+		a.activity_id AS "activityId",
+		a.condition_type AS "conditionType"
+	</sql>
+	
+	<sql id="mallPromotionActivityMjsJoins">
+	</sql>
+    
+	<select id="get" resultType="MallPromotionActivityMjs">
+		SELECT 
+			<include refid="mallPromotionActivityMjsColumns"/>
+		FROM mall_promotion_activity_mjs a
+		<include refid="mallPromotionActivityMjsJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MallPromotionActivityMjs">
+		SELECT 
+			<include refid="mallPromotionActivityMjsColumns"/>
+		FROM mall_promotion_activity_mjs a
+		<include refid="mallPromotionActivityMjsJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MallPromotionActivityMjs">
+		SELECT 
+			<include refid="mallPromotionActivityMjsColumns"/>
+		FROM mall_promotion_activity_mjs a
+		<include refid="mallPromotionActivityMjsJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_promotion_activity_mjs(
+			activity_mjs_id,
+			activity_id,
+			condition_type
+		) VALUES (
+			#{activityMjsId},
+			#{activityId},
+			#{conditionType}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_promotion_activity_mjs SET 	
+			activity_mjs_id = #{activityMjsId},
+			activity_id = #{activityId},
+			condition_type = #{conditionType}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_promotion_activity_mjs
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

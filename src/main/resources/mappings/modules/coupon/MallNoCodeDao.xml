@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.coupon.dao.MallNoCodeDao">
+    
+	<sql id="mallNoCodeColumns">
+		a.CODEID AS "codeId",
+		a.COMMAND_NAME AS "commandName",
+		a.TYPE_CODE AS "typeCode",
+		a.COMMAND_TYPE AS "commandType",
+		a.INCREASSE_RULE AS "increasseRule",
+		a.LAST_TIME AS "lastTime",
+		a.CODE_NUM AS "codeNum",
+		a.REMARK AS "remark"
+	</sql>
+	
+	<sql id="mallNoCodeJoins">
+	</sql>
+    
+	<select id="get" resultType="MallNoCode">
+		SELECT 
+			<include refid="mallNoCodeColumns"/>
+		FROM mall_no_code a
+		<include refid="mallNoCodeJoins"/>
+		WHERE a.CODEID = #{codeId}
+	</select>
+	
+	<select id="findList" resultType="MallNoCode">
+		SELECT 
+			<include refid="mallNoCodeColumns"/>
+		FROM mall_no_code a
+		<include refid="mallNoCodeJoins"/>
+		<where>
+			<if test="commandType != null and commandType != ''">
+				AND a.COMMAND_TYPE = #{commandType}
+			</if>
+			<if test="increasseRule != null and increasseRule != ''">
+				AND a.increasse_rule = #{increasseRule}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MallNoCode">
+		SELECT 
+			<include refid="mallNoCodeColumns"/>
+		FROM mall_no_code a
+		<include refid="mallNoCodeJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_no_code(
+			COMMAND_NAME,
+			TYPE_CODE,
+			COMMAND_TYPE,
+			INCREASSE_RULE,
+			LAST_TIME,
+			CODE_NUM,
+			REMARK
+		) VALUES (
+			#{commandName},
+			#{typeCode},
+			#{commandType},
+			#{increasseRule},
+			#{lastTime},
+			#{codeNum},
+			#{remark}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_no_code SET 	
+			COMMAND_NAME = #{commandName},
+			TYPE_CODE = #{typeCode},
+			COMMAND_TYPE =#{commandType},
+			INCREASSE_RULE = #{increasseRule},
+			LAST_TIME = #{lastTime},
+			CODE_NUM = #{codeNum},
+			REMARK = #{remark}
+		WHERE CODEID = #{codeId}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_no_code
+		WHERE CODEID = #{codeId}
+	</update>
+	
+</mapper>

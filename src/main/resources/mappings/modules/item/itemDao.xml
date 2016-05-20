@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.item.dao.ItemDao">
+	<!--mybatis ehcache缓存配置 -->
+	<!-- 以下两个<cache>标签二选一,第一个可以输出日志,第二个不输出日志 <cache type="org.mybatis.caches.ehcache.LoggingEhcache" 
+		/> -->
+	<!-- <cache type="org.mybatis.caches.ehcache.EhcacheCache"/> -->
+	<!-- 以下与实体类的中字段一致 -->
+	
+	<!-- 如果是 sqlserver， 可以替换以下的  -->
+		<!-- (select name+',' from mall_admin_role  where mall_admin_role.id in (SELECT roleId FROM mall_admin_user_role WHERE userId=mall_admin_user.id) FOR XML PATH('') ) roleName, -->
+	
+	<sql id="selectItemId">
+		a.item_id as itemId,
+		a.item_sku as itemSku,
+		a.item_name as itemName,
+		a.member_price as memberPrice,
+		a.market_price as marketPrice,
+		a.stock,
+		a.online_time as onlineTime,
+		a.offline_time as offlineTime,
+		a.has_presale as hasPresale,
+		a.status,
+		a.position,
+		a.is_valid as isValid,
+		b.cid as categoryId,
+		b.c_name as categoryName,
+		c.category_position as categoryPosition
+	</sql>
+	                                                                                                                          
+	<select id="findList" resultType="cn.com.bluemoon.jeesite.modules.item.entity.MallItemInfo">
+		SELECT 
+		<include refid="selectItemId" />
+		FROM mall_item_info a,mall_category_info b,mall_category_item c 
+		where c.ITEM_ID = a.ITEM_ID and b.CID = c.CID and a.is_valid = 1
+		<if test="itemName != null and itemName != ''">
+		and a.item_name like '%${itemName}%'
+		</if>
+		<if test="itemSku != null and itemSku != ''">
+		and a.item_sku like '%${itemSku}%'
+		</if>
+		<if test="onlineTime != null and onlineTime != ''">
+		and a.online_time between '${onlineDate} 00:00:00"+' and '${onlineDate} 23:59:59'
+		</if>
+		<if test="offlineTime != null and offlineTime != ''">
+		and a.offline_time between '${offlineDate} 00:00:00' and '${offlineDate} 23:59:59'
+		</if>
+		<if test="memberPrice != null and memberPrice != ''">
+		and a.member_price = '${memberPrice}'
+		</if>
+		<if test="status == 0 or status == 1">
+		and a.status = ${status}
+		</if>
+		<if test="categoryId != null and categoryId != ''">
+		and b.cid = '${categoryId}'
+		</if>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				<choose>
+					<when test="page.orderBy == 'category_position'">
+						ORDER BY c.category_position desc
+					</when>
+					<otherwise>
+						ORDER BY ${page.orderBy}
+					</otherwise>
+				</choose>
+			</when>
+			<otherwise>
+				ORDER BY a.status desc,a.modify_time desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findGoodBySku" parameterType="string" resultType="cn.com.bluemoon.jeesite.modules.item.entity.MallItemDetail">
+		SELECT
+				b.product_id AS goodId,
+				b.product_name AS goodName,
+				b.product_sku AS goodSku,
+				b.market_price AS marketPrice,
+				b.pic_url as picUrl,
+				'single' as goodType
+			FROM
+				mall_product_info b 
+				where b.status = 1 and(1=2
+		<if test="goodSkus != null and goodSkus != ''">
+			or b.product_sku in (${goodSkus})
+		</if>)
+		UNION ALL 
+		SELECT
+			a.suite_id AS goodId,
+			a.suite_name AS goodName,
+			a.suite_sku AS goodSku,
+			a.market_price AS marketPrice,
+			a.pic_url as picUrl,
+			'suite' as goodType
+		FROM
+			mall_item_suite a
+			where a.status = 1 and(1=2
+		<if test="goodSkus != null and goodSkus != ''">
+			or a.suite_sku in (${goodSkus})
+		</if>)
+		UNION ALL 
+		SELECT
+			c.vp_id AS goodId,
+			c.vp_name AS goodName,
+			c.vp_sku AS goodSku,
+			c.market_price AS marketPrice,
+			c.pic_url as picUrl,
+			'virtual' as goodType
+		FROM
+			mall_virtual_product c
+			where c.status = '1' and(1=2
+		<if test="goodSkus != null and goodSkus != ''">
+			or c.vp_sku in (${goodSkus})
+		</if>)
+	</select>
+	
+	<update id="delItem">
+		UPDATE mall_item_info a set a.is_valid =0,a.status = 0
+		where item_id = '${itemId}'
+	</update>
+	
+	<update id="offItem">
+		UPDATE mall_item_info a set a.status =0
+		where item_id = '${itemId}'
+	</update>
+	
+	
+	<select id="findGoodsByItemId" parameterType="string" resultType="cn.com.bluemoon.jeesite.modules.item.entity.MallItemDetailVo">
+		SELECT
+			a.detail_id as detailId,
+			b.product_id AS goodId,
+			b.product_name AS goodName,
+			b.product_sku AS goodSku,
+			b.market_price AS marketPrice,
+			a.good_type AS goodType,
+			a.PRICE AS price,
+			a.NUM AS num
+		FROM
+			mall_product_info b,
+			mall_item_detail a 
+		WHERE 
+			b.STATUS = 1
+		and	a.good_type = 'single' 
+		AND a.ITEM_ID = '${itemId}' 
+		AND a.GOOD_ID = b.PRODUCT_ID 
+		UNION ALL 
+		SELECT
+			a.detail_id as detailId,
+			c.suite_id AS goodId,
+			c.suite_name AS goodName,
+			c.suite_sku AS goodSku,
+			c.market_price AS marketPrice,
+			a.good_type AS goodType,
+			a.PRICE AS price,
+			a.NUM AS num
+		FROM
+			mall_item_suite c,
+			mall_item_detail a
+		WHERE
+			c.STATUS = 1
+		and	a.good_type = 'suite' 
+		AND a.ITEM_ID = '${itemId}' 
+		AND a.GOOD_ID = c.SUITE_ID 
+		UNION ALL 
+		SELECT
+			a.detail_id as detailId,
+			d.vp_id AS goodId,
+			d.vp_name AS goodName,
+			d.vp_sku AS goodSku,
+			d.market_price AS marketPrice,
+			a.good_type AS goodType,
+			a.PRICE AS price,
+			a.NUM AS num
+		FROM
+			mall_virtual_product d,
+			mall_item_detail a
+		WHERE
+			d.STATUS = '1'
+		and	a.good_type = 'virtual' 
+		AND a.ITEM_ID = '${itemId}' 
+		AND a.GOOD_ID = d.vp_id 
+	</select>
+	
+	
+	<insert id="insert" >
+		INSERT INTO mall_item_info(
+			item_id,item_name,item_sku,member_price,market_price, 
+			stock,sell_point,item_desc,pic_url,online_time,
+			offline_time,position,has_presale,status,is_valid,
+			create_by,create_time,modify_by,modify_time
+		) VALUES (
+			#{itemId},#{itemName},#{itemSku},#{memberPrice},#{marketPrice},
+			#{stock},#{sellPoint},#{itemDesc},#{picUrl},#{onlineTime},  
+			#{offlineTime},#{position},#{hasPresale},#{status},#{isValid},  
+			#{createBy.name},#{createDate},#{updateBy.name},#{updateDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_item_info SET 	
+			item_name = #{itemName},item_sku = #{itemSku},member_price = #{memberPrice},
+			market_price = #{marketPrice},stock = #{stock},sell_point = #{sellPoint},
+			item_desc = #{itemDesc},pic_url = #{picUrl},online_time = #{onlineTime},
+			offline_time = #{offlineTime},position = #{position},has_presale = #{hasPresale},
+			status = #{status},is_valid = #{isValid},modify_by = #{updateBy.name},modify_time = #{updateDate}
+		WHERE item_id = #{itemId}
+	</update>
+	
+	<select id="get" resultType="cn.com.bluemoon.jeesite.modules.item.entity.MallItemInfo">
+		SELECT 
+		<include refid="selectItemId" />
+		,a.item_desc as itemDesc,a.sell_point as sellPoint,a.pic_url as picUrl 
+		FROM mall_item_info a,mall_category_info b,mall_category_item c 
+		where c.ITEM_ID = a.ITEM_ID and b.CID = c.CID and a.item_id = #{id}
+	</select>
+	
+	<select id="findItemBySku" resultType="cn.com.bluemoon.jeesite.modules.item.entity.MallItemInfo">
+		SELECT 
+		a.item_id as itemId,
+		a.item_sku as itemSku,
+		a.item_name as itemName,
+		a.member_price as memberPrice,
+		a.market_price as marketPrice,
+		a.stock,
+		a.online_time as onlineTime,
+		a.offline_time as offlineTime
+		FROM mall_item_info a
+		where a.status = 1 and a.is_valid = 1 and a.item_sku = #{itemSku}
+		and a.offline_time > NOW()
+	</select>
+	
+	<select id="getById" resultType="cn.com.bluemoon.jeesite.modules.item.entity.MallItemInfo">
+		SELECT 
+			a.item_id as itemId,
+			a.item_sku as itemSku,
+			a.item_name as itemName,
+			a.member_price as memberPrice,
+			a.market_price as marketPrice,
+			a.stock,
+			a.online_time as onlineTime,
+			a.offline_time as offlineTime,
+			a.has_presale as hasPresale,
+			a.status,
+			a.position
+		FROM mall_item_info a
+		where a.item_id = #{itemId}
+	</select>
+	
+	
+	<select id="findRecommendItem" resultType="cn.com.bluemoon.jeesite.modules.item.entity.MallItemInfo">
+		SELECT 
+		a.item_id as itemId,
+		a.item_sku as itemSku,
+		a.item_name as itemName,
+		a.member_price as memberPrice,
+		a.market_price as marketPrice,
+		b.cid as categoryId
+		FROM mall_item_info a,mall_category_item b
+		where a.is_valid = 1 and a.status = 1 and a.item_id = b.item_id and a.item_id not in (select item_id from mall_item_recommend ) 
+		<if test="itemName != null and itemName != ''">
+		and a.item_name like 
+			<if test="dbName == 'mysql'">concat('%',#{itemName},'%')</if>
+		</if>
+		<if test="itemSku != null and itemSku != ''">
+		and a.item_sku like 
+			<if test="dbName == 'mysql'">concat('%',#{itemSku},'%')</if>
+		</if>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.status desc,a.modify_time desc
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+	<select id="findByPosition" resultType="cn.com.bluemoon.jeesite.modules.item.entity.MallItemInfo">
+		select 
+			a.item_id as itemId,
+			a.item_sku as itemSku,
+			a.item_name as itemName,
+			a.member_price as memberPrice,
+			a.market_price as marketPrice,
+			a.stock,
+			a.online_time as onlineTime,
+			a.offline_time as offlineTime,
+			a.has_presale as hasPresale,
+			a.status,
+			a.position,
+			a.is_valid as isValid
+		from mall_item_info a
+		<where>
+			a.STATUS = 1 
+			and is_valid = 1
+			AND ONLINE_TIME &lt; NOW() 
+			AND OFFLINE_TIME &gt; NOW()
+			<if test="position != null and position != '' and position != 0">
+				and a.position = #{position}
+			</if>
+			<if test="itemId != null and itemId != ''">
+				and a.item_id != #{itemId}
+			</if>
+		</where>
+	</select>
+	<update id="updatePosition">
+		UPDATE mall_item_info SET 	
+			position = position+1
+		WHERE STATUS = 1 
+		and is_valid = 1
+		AND online_time &lt; NOW() 
+		AND offline_time > NOW()
+		AND position >= #{position}
+	</update>
+	
+	<select id="findCouponItem" resultType="cn.com.bluemoon.jeesite.modules.item.entity.MallItemInfo">
+		SELECT 
+		a.item_id as itemId,
+		a.item_sku as itemSku,
+		a.item_name as itemName
+		FROM mall_item_info a
+		<where>
+			a.is_valid = 1 and a.status = 1 
+			<if test="itemName != null and itemName != ''">
+			and a.item_name like 
+				<if test="dbName == 'mysql'">concat('%',#{itemName},'%')</if>
+			</if>
+			<if test="itemSku != null and itemSku != ''">
+			and a.item_sku like 
+				<if test="dbName == 'mysql'">concat('%',#{itemSku},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.status desc,a.modify_time desc
+			</otherwise>
+		</choose>
+	</select>
+</mapper>

@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.hb.dao.MallWxRedpacketApplyDetailsDao">
+    
+	<sql id="mallWxRedpacketApplyDetailsColumns">
+		a.applyid AS "applyid",
+		a.merchant_order_no AS "merchantOrderNo",
+		a.send_listid AS "sendListid",
+		a.send_time AS "sendTime",
+		a.processinstid AS "processinstid",
+		a.redpacket_no AS "redpacketNo",
+		a.referrer_no AS "referrerNo",
+		a.referrer_name AS "referrerName",
+		a.user_openid AS "userOpenid",
+		a.redpacket__amount_yuan AS "redpacketAmountYuan",
+		a.redpacket__amount_fen AS "redpacketAmountFen",
+		a.redpacket__min_amount AS "redpacketMinAmount",
+		a.redpacket__max_amount AS "redpacketMaxAmount",
+		a.send_total_people AS "sendTotalPeople",
+		a.redpacket__greetings AS "redpacketGreetings",
+		a.redpacket_status AS "redpacketStatus",
+		a.hd_name AS "hdName",
+		a.marker AS "marker",
+		a.isdeleted AS "isdeleted",
+		a.operator AS "operator",
+		a.operatortime AS "operatortime"
+	</sql>
+	
+	<sql id="mallWxRedpacketApplyDetailsJoins">
+	</sql>
+    
+	<select id="get" resultType="MallWxRedpacketApplyDetails">
+		SELECT 
+			<include refid="mallWxRedpacketApplyDetailsColumns"/>
+		FROM mall_wx_redpacket_apply_details a
+		<include refid="mallWxRedpacketApplyDetailsJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MallWxRedpacketApplyDetails">
+		SELECT 
+			<include refid="mallWxRedpacketApplyDetailsColumns"/>
+		FROM mall_wx_redpacket_apply_details a
+		<include refid="mallWxRedpacketApplyDetailsJoins"/>
+		<where>
+			isdeleted = 0
+			<if test="applyid != null and applyid != ''">
+				AND a.applyid = #{applyid}
+			</if>
+			<if test="redpacketNo != null and redpacketNo != ''">
+				AND a.redpacket_no = #{redpacketNo}
+			</if>
+			<if test="merchantOrderNo != null and merchantOrderNo != ''">
+				AND a.merchant_order_no = #{merchantOrderNo}
+			</if>
+			<if test="redpacketStatus != null and redpacketStatus != ''">
+				AND a.redpacket_status = #{redpacketStatus}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MallWxRedpacketApplyDetails">
+		SELECT 
+			<include refid="mallWxRedpacketApplyDetailsColumns"/>
+		FROM mall_wx_redpacket_apply_details a
+		<include refid="mallWxRedpacketApplyDetailsJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_wx_redpacket_apply_details(
+			applyid,
+			merchant_order_no,
+			send_listid,
+			send_time,
+			processinstid,
+			redpacket_no,
+			referrer_no,
+			referrer_name,
+			user_openid,
+			redpacket__amount_yuan,
+			redpacket__amount_fen,
+			redpacket__min_amount,
+			redpacket__max_amount,
+			send_total_people,
+			redpacket__greetings,
+			redpacket_status,
+			hd_name,
+			marker,
+			isdeleted,
+			operator,
+			operatortime
+		) VALUES (
+			#{applyid},
+			#{merchantOrderNo},
+			#{sendListid},
+			#{sendTime},
+			#{processinstid},
+			#{redpacketNo},
+			#{referrerNo},
+			#{referrerName},
+			#{userOpenid},
+			#{redpacketAmountYuan},
+			#{redpacketAmountFen},
+			#{redpacketMinAmount},
+			#{redpacketMaxAmount},
+			#{sendTotalPeople},
+			#{redpacketGreetings},
+			#{redpacketStatus},
+			#{hdName},
+			#{marker},
+			#{isdeleted},
+			#{operator},
+			#{operatortime}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_wx_redpacket_apply_details SET 	
+			merchant_order_no = #{merchantOrderNo},
+			send_listid = #{sendListid},
+			send_time = #{sendTime},
+			processinstid = #{processinstid},
+			referrer_no = #{referrerNo},
+			referrer_name = #{referrerName},
+			user_openid = #{userOpenid},
+			redpacket__amount_yuan = #{redpacketAmountYuan},
+			redpacket__amount_fen = #{redpacketAmountFen},
+			redpacket__min_amount = #{redpacketMinAmount},
+			redpacket__max_amount = #{redpacketMaxAmount},
+			send_total_people = #{sendTotalPeople},
+			redpacket__greetings = #{redpacketGreetings},
+			redpacket_status = #{redpacketStatus},
+			hd_name = #{hdName},
+			marker = #{marker},
+			isdeleted = #{isdeleted},
+			operator = #{operator},
+			operatortime = #{operatortime}
+		WHERE applyid = #{applyid} and redpacket_no = #{redpacketNo}
+	</update>
+	
+	<update id="delete">
+		UPDATE mall_wx_redpacket_apply_details SET 	
+			isdeleted = #{isdeleted},
+			operator = #{operator},
+			operatortime = #{operatortime}
+		WHERE applyid = #{applyid}
+	</update>
+	
+	<select id="findListNum" resultType="Integer">
+		SELECT 
+			count(1)
+		FROM mall_wx_redpacket_apply_details a
+		<where>
+			isdeleted = 0
+			<if test="applyid != null and applyid != ''">
+				AND a.applyid = #{applyid}
+			</if>
+		</where>
+	</select>
+	
+	<update id="updateStatus">
+		UPDATE mall_wx_redpacket_apply_details SET 	
+			redpacket_status = #{redpacketStatus}
+		WHERE applyid = #{applyid} and isdeleted = 0
+	</update>
+	
+	<delete id="delFileDetailByApplyid">
+		delete from mall_wx_redpacket_apply_details 
+		WHERE applyid = #{applyid} 
+	</delete>
+	
+	<select id="findByRedpackno" resultType="MallWxRedpacketApplyDetails">
+		SELECT 
+			<include refid="mallWxRedpacketApplyDetailsColumns"/>
+		FROM mall_wx_redpacket_apply_details a
+		<include refid="mallWxRedpacketApplyDetailsJoins"/>
+		<where>
+			isdeleted = 0 and
+				a.applyid = '${applyid}'
+				AND a.redpacket_no in (${redpacketNoStr})
+		</where>
+	</select>
+	
+	
+</mapper>

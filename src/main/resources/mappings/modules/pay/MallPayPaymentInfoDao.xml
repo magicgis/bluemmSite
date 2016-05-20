@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.pay.dao.MallPayPaymentInfoDao">
+    
+	<sql id="mallPayPaymentInfoColumns">
+		a.payment_id AS "paymentId",
+		a.out_trade_no AS "outTradeNo",
+		a.transaction_id AS "transactionId",
+		a.pay_status AS "payStatus",
+		a.total_fee AS "totalFee",
+		a.pay_platform AS "payPlatform",
+		a.trade_type AS "tradeType",
+		a.mch_id AS "mchId",
+		a.prepay_id AS "prepayId",
+		a.create_time AS "createTime",
+		a.pay_time AS "payTime",
+		a.response_msg AS "responseMsg",
+		a.validate AS "validate"
+	</sql>
+	
+	<sql id="mallPayPaymentInfoJoins">
+	</sql>
+    
+	<select id="get" resultType="MallPayPaymentInfo">
+		SELECT 
+			<include refid="mallPayPaymentInfoColumns"/>
+		FROM mall_pay_payment_info a
+		<include refid="mallPayPaymentInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MallPayPaymentInfo">
+		SELECT 
+			<include refid="mallPayPaymentInfoColumns"/>
+		FROM mall_pay_payment_info a
+		<include refid="mallPayPaymentInfoJoins"/>
+		<where>
+			
+			<if test="outTradeNo != null and outTradeNo != ''">
+				AND a.out_trade_no like CONCAT('%', '${outTradeNo}', '%') 
+			</if>
+			<if test="transactionId != null and transactionId != ''">
+				AND a.transaction_id like CONCAT('%', '${transactionId}', '%') 
+			</if>
+			<if test="payStatus != null and payStatus != ''">
+				AND a.pay_status = #{payStatus}
+			</if>
+			<if test="totalFee != null and totalFee != ''">
+				AND a.total_fee = #{totalFee}
+			</if>
+			<if test="payPlatform != null and payPlatform != ''">
+				AND a.pay_platform = #{payPlatform}
+			</if>
+			<if test="tradeType != null and tradeType != ''">
+				AND a.trade_type = #{tradeType}
+			</if>
+			<if test="payTime1 != null and payTime1 != ''">
+				AND a.pay_time >= #{payTime1}
+			</if>
+			<if test="payTime2 != null and payTime2 != ''">
+				AND a.pay_time <![CDATA[ < ]]> #{payTime2}
+			</if>
+			
+			<if test="totalFee1 != null and totalFee1 != ''">
+				AND a.total_fee >= (#{totalFee1}*100)
+			</if>
+			<if test="totalFee2 != null and totalFee2 != ''">
+				AND a.total_fee <![CDATA[ < ]]> (#{totalFee2}*100)
+			</if>
+			
+			<if test="validate != null and validate != ''">
+				AND a.validate = #{validate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MallPayPaymentInfo">
+		SELECT 
+			<include refid="mallPayPaymentInfoColumns"/>
+		FROM mall_pay_payment_info a
+		<include refid="mallPayPaymentInfoJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_pay_payment_info(
+			payment_id,
+			out_trade_no,
+			transaction_id,
+			pay_status,
+			total_fee,
+			pay_platform,
+			trade_type,
+			mch_id,
+			prepay_id,
+			create_time,
+			pay_time,
+			response_msg,
+			validate
+		) VALUES (
+			#{paymentId},
+			#{outTradeNo},
+			#{transactionId},
+			#{payStatus},
+			#{totalFee},
+			#{payPlatform},
+			#{tradeType},
+			#{mchId},
+			#{prepayId},
+			#{createTime},
+			#{payTime},
+			#{responseMsg},
+			#{validate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_pay_payment_info SET 	
+			payment_id = #{paymentId},
+			out_trade_no = #{outTradeNo},
+			transaction_id = #{transactionId},
+			pay_status = #{payStatus},
+			total_fee = #{totalFee},
+			pay_platform = #{payPlatform},
+			trade_type = #{tradeType},
+			mch_id = #{mchId},
+			prepay_id = #{prepayId},
+			create_time = #{createTime},
+			pay_time = #{payTime},
+			response_msg = #{responseMsg},
+			validate = #{validate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_pay_payment_info
+		WHERE id = #{id}
+	</update>
+	
+	
+	<select id="findListByOutTradeNos" parameterType="string" resultType="MallPayPaymentInfo">
+		SELECT 
+			<include refid="mallPayPaymentInfoColumns"/>
+		FROM mall_pay_payment_info a
+		where out_trade_no in (${outTradeNos})
+	</select>
+	
+	
+	<select id="findListByTransactionIds" parameterType="string" resultType="MallPayPaymentInfo">
+		SELECT 
+			<include refid="mallPayPaymentInfoColumns"/>
+		FROM mall_pay_payment_info a
+		where transaction_id in (${transactionIds})
+	</select>
+	
+	
+	<update id="updateRefundPaystatusById" parameterType="string">
+		UPDATE mall_pay_payment_info SET 
+			pay_status = #{payStatus} 
+		WHERE id = #{id}
+	</update>
+	<update id="updateRefundPaystatusByOutTradeNo" parameterType="string">
+		UPDATE mall_pay_payment_info SET 
+			pay_status = #{payStatus} 
+		WHERE OUT_TRADE_NO = #{outTradeNo}
+	</update>
+	
+	
+	<update id="updateValidateByOutTradeNo" parameterType="string">
+		UPDATE mall_pay_payment_info SET 
+			pay_status = #{payStatus}, validate=#{validate}
+		WHERE OUT_TRADE_NO = #{outTradeNo}
+	</update>
+	
+	
+</mapper>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.item.dao.ItemRecommendDao">
+	<!--mybatis ehcache缓存配置 -->
+	<!-- 以下两个<cache>标签二选一,第一个可以输出日志,第二个不输出日志 <cache type="org.mybatis.caches.ehcache.LoggingEhcache" 
+		/> -->
+	<!-- <cache type="org.mybatis.caches.ehcache.EhcacheCache"/> -->
+	<!-- 以下与实体类的中字段一致 -->
+	
+	<!-- 如果是 sqlserver， 可以替换以下的  -->
+		<!-- (select name+',' from mall_admin_role  where mall_admin_role.id in (SELECT roleId FROM mall_admin_user_role WHERE userId=mall_admin_user.id) FOR XML PATH('') ) roleName, -->
+	<sql id="allColumn">
+		a.ID as id,
+		a.ITEM_ID as itemId,
+		a.RE_PIC_URL as rePicUrl,
+		a.RECOMMEND_TYPE as recommendType,
+		a.ON_RECOM_DATE as onRecomDate,
+		a.OFF_RECOM_DATE as offRecomDate,
+		a.position as position,
+		a.status as status
+	</sql>
+	
+	<select id="findByItemId" parameterType="string" resultType="cn.com.bluemoon.jeesite.modules.item.entity.ItemRecommend">
+		SELECT
+			<include refid="allColumn"/>
+		FROM
+			mall_item_recommend a 
+		WHERE a.ITEM_ID = '${itemId}' 
+	</select>
+	
+	<select id="findByPosition" resultType="cn.com.bluemoon.jeesite.modules.item.entity.ItemRecommend">
+		select 
+			<include refid="allColumn"/>
+		from mall_item_recommend a
+		<where>
+			a.STATUS = 1 
+			AND ON_RECOM_DATE &lt; NOW() 
+			AND OFF_RECOM_DATE &gt; NOW()
+			<if test="position != null and position != '' and position != 0">
+				and a.position = #{position}
+			</if>
+			<if test="itemId != null and itemId != ''">
+				and a.item_id != #{itemId}
+			</if>
+		</where>
+	</select>
+	<update id="updatePosition">
+		UPDATE 
+			mall_item_info a, mall_item_recommend b
+		SET 
+			b.POSITION = b.POSITION + 1
+		WHERE
+			a.ITEM_ID = b.ITEM_ID
+		AND a.STATUS = 1
+		AND a.ONLINE_TIME &lt; NOW()
+		AND a.OFFLINE_TIME &gt; NOW()
+		AND b.STATUS = 1
+		AND b.ON_RECOM_DATE &lt; NOW() 
+		AND b.OFF_RECOM_DATE &gt; NOW()
+		AND b.POSITION > #{POSITION}
+	</update>
+</mapper>

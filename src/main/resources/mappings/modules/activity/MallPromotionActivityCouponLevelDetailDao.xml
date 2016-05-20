@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.activity.dao.MallPromotionActivityCouponLevelDetailDao">
+    
+	<sql id="mallPromotionActivityCouponLevelDetailColumns">
+		a.coupon_level_detail_id AS "couponLevelDetailId",
+		a.coupon_level_id AS "couponLevelId",
+		a.coupon_id AS "couponId",
+		a.send_num AS "sendNum"
+	</sql>
+	
+	<sql id="otherColumns">
+		b.coupon_s_name as "couponSName",
+	</sql>
+	
+	<sql id="mallPromotionActivityCouponLevelDetailJoins">
+		join mall_promotion_coupon_info b on a.coupon_id = b.coupon_id
+	</sql>
+    
+	<select id="get" resultType="MallPromotionActivityCouponLevelDetail">
+		SELECT 
+			<include refid="otherColumns"/>
+			<include refid="mallPromotionActivityCouponLevelDetailColumns"/>
+		FROM mall_promotion_activity_coupon_level_detail a
+		<include refid="mallPromotionActivityCouponLevelDetailJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MallPromotionActivityCouponLevelDetail">
+		SELECT 
+			<include refid="otherColumns"/>
+			<include refid="mallPromotionActivityCouponLevelDetailColumns"/>
+		FROM mall_promotion_activity_coupon_level_detail a
+		<include refid="mallPromotionActivityCouponLevelDetailJoins"/>
+		<where>
+			<if test="couponLevelId != null and couponLevelId != ''">
+				AND a.coupon_level_id = #{couponLevelId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MallPromotionActivityCouponLevelDetail">
+		SELECT 
+			<include refid="mallPromotionActivityCouponLevelDetailColumns"/>
+		FROM mall_promotion_activity_coupon_level_detail a
+		<include refid="mallPromotionActivityCouponLevelDetailJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_promotion_activity_coupon_level_detail(
+			coupon_level_detail_id,
+			coupon_level_id,
+			coupon_id,
+			send_num
+		) VALUES (
+			#{couponLevelDetailId},
+			#{couponLevelId},
+			#{couponId},
+			#{sendNum}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_promotion_activity_coupon_level_detail SET 	
+			coupon_level_detail_id = #{couponLevelDetailId},
+			coupon_level_id = #{couponLevelId},
+			coupon_id = #{couponId},
+			send_num = #{sendNum}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_promotion_activity_coupon_level_detail
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

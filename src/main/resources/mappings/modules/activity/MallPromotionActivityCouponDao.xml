@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.bluemoon.jeesite.modules.activity.dao.MallPromotionActivityCouponDao">
+    
+	<sql id="mallPromotionActivityCouponColumns">
+		a.activity_coupon_id AS "activityCouponId",
+		a.activity_id AS "activityId",
+		a.send_coupon_type AS "sendCouponType",
+		a.condition_type AS "conditionType",
+		a.position AS "position"
+	</sql>
+	
+	<sql id="mallPromotionActivityCouponJoins">
+	</sql>
+    
+	<select id="get" resultType="MallPromotionActivityCoupon">
+		SELECT 
+			<include refid="mallPromotionActivityCouponColumns"/>
+		FROM mall_promotion_activity_coupon a
+		<include refid="mallPromotionActivityCouponJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MallPromotionActivityCoupon">
+		SELECT 
+			<include refid="mallPromotionActivityCouponColumns"/>
+		FROM mall_promotion_activity_coupon a
+		<include refid="mallPromotionActivityCouponJoins"/>
+		<where>
+			
+			<if test="activityCouponId != null and activityCouponId != ''">
+				AND a.activity_coupon_id = #{activityCouponId}
+			</if>
+			<if test="activityId != null and activityId != ''">
+				AND a.activity_id = #{activityId}
+			</if>
+			<if test="sendCouponType != null and sendCouponType != ''">
+				AND a.send_coupon_type = #{sendCouponType}
+			</if>
+			<if test="conditionType != null and conditionType != ''">
+				AND a.condition_type = #{conditionType}
+			</if>
+			<if test="position != null and position != ''">
+				AND a.position = #{position}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MallPromotionActivityCoupon">
+		SELECT 
+			<include refid="mallPromotionActivityCouponColumns"/>
+		FROM mall_promotion_activity_coupon a
+		<include refid="mallPromotionActivityCouponJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mall_promotion_activity_coupon(
+			activity_coupon_id,
+			activity_id,
+			send_coupon_type,
+			condition_type,
+			position
+		) VALUES (
+			#{activityCouponId},
+			#{activityId},
+			#{sendCouponType},
+			#{conditionType},
+			#{position}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mall_promotion_activity_coupon SET 	
+			activity_coupon_id = #{activityCouponId},
+			activity_id = #{activityId},
+			send_coupon_type = #{sendCouponType},
+			condition_type = #{conditionType},
+			position = #{position}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM mall_promotion_activity_coupon
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
