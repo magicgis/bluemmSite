@@ -82,7 +82,7 @@
 			<id>spring-milestone</id>
 			<name>Spring Maven MILESTONE Repository</name>
 			<url>http://maven.springframework.org/milestone</url>
-		</repository>-->
+		</repository>
 		<repository>
         <snapshots>
             <enabled>false</enabled>
@@ -90,7 +90,7 @@
         <id>central</id>
         <name>bintray</name>
         <url>http://jcenter.bintray.com</url>
-    </repository>
+    </repository>-->
 	</repositories>
 
 	<!-- 设定插件仓库 -->
